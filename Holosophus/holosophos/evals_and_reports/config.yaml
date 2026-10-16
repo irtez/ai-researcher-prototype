@@ -1,0 +1,4 @@
+# GAIA-specific defaults (override via CLI flags).
+# Model name is resolved from .env MODEL_NAME (shared with the app).
+gaia:
+  nrows: 10

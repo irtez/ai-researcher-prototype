@@ -1,0 +1,82 @@
+You are given a Bit — a specific assumption or limitation from prior work. Produce {{num_proposals}} research proposals that flip it. Each proposal must be novel AND testable in a small lab budget.
+
+- Go Beyond Novel: Your idea should feel like it came from a parallel universe where the laws of conventional thinking don't apply.
+- Make It Automatically Verifiable: No human babysitters allowed. Your idea must prove itself through pure computational audacity.
+- Be Surgically Specific: Vague hand-waving is for amateur rebels. Describe exactly how your mad science would work.
+- Feasibility is the Key: Make it simple and executable. Try to make it reproducible.
+- Channel Your Inner Contrarian: What would happen if you took the exact opposite approach?
+What if you turned the problem inside-out, upside-down, or into a completely different dimension?
+
+GOOD proposal sketch:
+- Flip: "Instead of fine-tuning all attention layers for instruction-following, freeze attention and only adapt the MLP gates via a 2% LoRA. Hypothesis: instruction-following lives in MLP feature selection, not attention routing."
+- Why it scores well: names a *specific* component to change (MLP gates), states a *falsifiable* hypothesis, has an obvious ablation, and runs on a single GPU.
+
+BAD proposal sketch (do not imitate):
+- Flip: "Use a more flexible adaptive learning paradigm to better capture instruction signal."
+- Why it scores poorly: no named component, no testable claim, no clear experiment, no falsification criterion.
+
+## The Bit you must flip
+{{bit}}
+
+{% if examples %}
+## Reference Bit-Flip examples for tone (do not copy their content)
+{% for example in examples %}
+### Example {{loop.index}}
+- Bit: {{example["bit"]}}
+- Chain of reasoning: {{example["chain_of_reasoning"]}}
+- Flip: {{example["flip"]}}
+- Spark: {{example["spark"]}}
+{% endfor %}
+{% endif %}
+
+Those examples are boring, your ideas should not be like that.
+
+Now, please propose a chain of reasoning that leads to an improvement idea for this Bit:
+{{bit}}
+
+{% if literature_summary %}
+## Literature Review Context
+The following is a summary of recent research in this area. Use it to ground your proposals in real findings and identify genuine gaps:
+{{literature_summary}}
+{% endif %}
+
+{% if additional_context %}Additional context:
+{{additional_context}}{% endif %}
+
+## How to think (do this internally before writing JSON)
+For each of the {{num_proposals}} proposals, work through these steps:
+
+1. Identify which sub-claim of the Bit you are attacking. Quote the exact phrase.
+2. Generate the Flip mechanism. Be specific about: which model component, which training signal, which data source changes.
+3. Stress-test feasibility: can this run on ≤8xA100 for ≤7 days, or via public APIs at <$500? If not, scale it down until it can.
+4. Stress-test novelty: is this just a known technique with a new name? If yes, discard and regenerate.
+5. Pick one experiment that *would falsify* the proposal if it failed, and name the metric, the dataset, and the threshold.
+6. Diversify: across the {{num_proposals}} proposals, attack different sub-claims of the Bit. Avoid near-duplicates.
+
+## Required content per proposal
+
+Each proposal must contain:
+- chain_of_reasoning (≥5 sentences): walk through steps 1-5 above for this idea, in prose. This is the part a reviewer reads first.
+- flip (≥2 sentences): the mechanism, with named components.
+- spark (4-6 words): handle for the idea.
+- abstract (~250 words, conference style): motivation → method → expected result → significance.
+- experiments (list of strings): each experiment must specify (a) dataset by name (e.g. "GSM8K", "ImageNet-1k val"), (b) baseline by name, (c) primary metric, (d) the effect size or comparison that would constitute success. Avoid phrases like "standard benchmarks" or "common datasets" — name them.
+- risks_and_limitations (list of strings): include at least one *falsification criterion* — a concrete observation that would force you to abandon the idea (e.g. "if accuracy on GSM8K drops below the 7B baseline by >2 pts, the hypothesis is rejected").
+
+## Output
+Return only the JSON list. No prose before or after. No markdown fences.
+
+Return only the JSON list of proposals in this exact format:
+{
+    "proposals": [
+        {
+            "chain_of_reasoning": "Chain of reasoning that leads to an improvement idea for this Bit. At least 5 sentences.",
+            "flip": "Your wildest, craziest, most innovative idea, in at least two sentences",
+            "spark": "4-6 word summary",
+            "abstract": "An abstract that summarizes the proposal in conference format (approximately 250 words).",
+            "experiments": ["...", "..."],
+            "risks_and_limitations": ["...", "..."]
+        },
+        ...
+    ]
+}

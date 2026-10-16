@@ -1,0 +1,6 @@
+# Add to docker-compose.claude.yml. The console talks directly to these APIs;
+# no browser UI or web proxy is required. Start the explicit console service set.
+services:
+  ui-api:
+    ports:
+      - "127.0.0.1:${CONSOLE_DATA_PORT:-5065}:5058"

@@ -1,0 +1,339 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: holosophos/Dockerfile
+    container_name: holosophos
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    environment:
+      - CODEARKT_EXECUTOR_URL=http://executor:8000
+      - ACADEMIA_MCP_URL=http://academia:${ACADEMIA_PORT:-5056}/mcp
+      - MLE_KIT_MCP_URL=http://mle_kit:${MLE_KIT_PORT:-5057}/mcp
+      - PAPERBANANA_MCP_URL=http://paperbanana-mcp:${PAPERBANANA_PORT:-5060}/mcp
+      - WRITER_TOOLS_MCP_URL=http://writer-tools:5059/mcp
+      - LANGFUSE_HOST=http://host.docker.internal:3051
+      - LANGFUSE_PUBLIC_KEY=${LANGFUSE_PUBLIC_KEY_V3}
+      - LANGFUSE_SECRET_KEY=${LANGFUSE_SECRET_KEY_V3}
+      - LANGFUSE_PROJECT_NAME=${LANGFUSE_PROJECT_NAME:-ai_scientist}
+      - MODEL_NAME=${MODEL_NAME:-deepseek/deepseek-chat-v3.1}
+      - WORKSPACE_DIR=/workdir
+      - AI_RESEARCHER_MODELS_CONFIG=/model-config/models.yaml
+    volumes:
+      - ./workdir:/workdir
+      - ./config:/model-config:ro
+    env_file:
+      - .env
+    depends_on:
+      executor:
+        condition: service_healthy
+      langfuse-server:
+        condition: service_started
+      academia:
+        condition: service_healthy
+      mle_kit:
+        condition: service_healthy
+      paperbanana-mcp:
+        condition: service_healthy
+      writer-tools:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-5055}:5055"
+    command: ["python", "-m", "holosophos.server", "--port", "5055"]
+
+  ui-api:
+    profiles:
+      - ui
+    build:
+      context: .
+      dockerfile: docker/ui-api.Dockerfile
+    environment:
+      - WORKSPACE_DIR=/workdir
+      - AI_RESEARCHER_MODELS_CONFIG=/model-config/models.yaml
+    env_file:
+      - .env
+    volumes:
+      - ./workdir:/workdir
+      - ./config:/model-config:ro
+      - paper_registry_state:/workdir/.paper_registry:ro
+    expose:
+      - "5058"
+
+  ui:
+    profiles:
+      - ui
+    build:
+      context: .
+      dockerfile: docker/ui.Dockerfile
+    depends_on:
+      app:
+        condition: service_started
+      ui-api:
+        condition: service_healthy
+    # SC8 (ui-claude-code-orchestrator): the nginx /agents/ map routes claude_code
+    # runs to host.docker.internal:5061 (the host-side cc_runner). On macOS Docker
+    # Desktop that name resolves out of the box; on Linux (Selectel deploy) it needs
+    # this host-gateway alias.
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "${UI_PORT:-5062}:5059"
+
+  executor:
+    build:
+      context: ./codearkt/container
+      dockerfile: Dockerfile
+    environment:
+      - SERVER_URL_TEMPLATE=http://app:{port}
+    read_only: true
+    tmpfs:
+      - /tmp:rw,size=64m
+      - /run:rw,size=16m
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    deploy:
+      resources:
+        limits:
+          # Single shared executor for all concurrent sessions. Sized for ~5
+          # parallel light sessions (SC1); tune empirically per host.
+          cpus: "4.0"
+          memory: 8g
+          pids: 4096
+    expose:
+      - "8000"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s=socket.socket(); s.settimeout(1); s.connect(('localhost',8000)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+    env_file:
+      - .env
+
+  writer-tools:
+    build:
+      context: .
+      dockerfile: holosophos/Dockerfile
+    command:
+      - python
+      - -m
+      - holosophos.tools.writer.mcp_server
+      - --transport
+      - streamable-http
+      - --host
+      - 0.0.0.0
+      - --port
+      - "5059"
+    ports:
+      - "127.0.0.1:${WRITER_TOOLS_PORT:-5059}:5059"
+    environment:
+      - WORKSPACE_DIR=/workdir
+      - WRITER_CHECK_STATE_DB_PATH=/state/checks.sqlite3
+      - WRITER_CHECK_MAX_RERUNS=${WRITER_CHECK_MAX_RERUNS:-4}
+      - WRITER_CHECK_TOOL_MAX_RETRIES=${WRITER_CHECK_TOOL_MAX_RETRIES:-10}
+      - WRITER_CHECK_STATE_RETENTION_HOURS=${WRITER_CHECK_STATE_RETENTION_HOURS:-168}
+    volumes:
+      - ./workdir:/workdir:ro
+      - writer_tools_state:/state
+      - paper_registry_state:/workdir/.paper_registry
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s=socket.socket(); s.settimeout(1); s.connect(('localhost',5059)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+
+  langfuse-server:
+    image: docker.io/langfuse/langfuse:2.95
+    restart: unless-stopped
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+    ports:
+      - "${LANGFUSE_PORT:-3050}:3000"
+    environment:
+      DATABASE_URL: postgresql://${LANGFUSE_POSTGRES_USER:-postgres}:${LANGFUSE_POSTGRES_PASSWORD:-postgres}@langfuse-db:5432/${LANGFUSE_POSTGRES_DB:-postgres}
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-replace_me_langfuse_nextauth_secret}
+      SALT: ${LANGFUSE_SALT:-replace_me_langfuse_salt}
+      ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
+      NEXTAUTH_URL: ${LANGFUSE_HOST:-http://localhost:3050}
+    env_file:
+      - .env
+
+  langfuse-db:
+    image: docker.io/postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${LANGFUSE_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${LANGFUSE_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${LANGFUSE_POSTGRES_DB:-postgres}
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - langfuse_database_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LANGFUSE_POSTGRES_USER:-postgres}"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  academia:
+    build:
+      context: .
+      dockerfile: academia_mcp/Dockerfile
+    command: ["python", "-m", "academia_mcp", "--transport", "streamable-http", "--host", "0.0.0.0", "--port", "${ACADEMIA_PORT:-5056}"]
+    ports:
+      - "${ACADEMIA_PORT:-5056}:${ACADEMIA_PORT:-5056}"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os,socket; p=int(os.environ.get('ACADEMIA_PORT',5056)); s=socket.socket(); s.settimeout(1); s.connect(('localhost',p)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+    depends_on:
+      searxng:
+        condition: service_healthy
+    environment:
+      - WORKSPACE_DIR=/workdir
+      - UV_HTTP_TIMEOUT=300
+    volumes:
+      - ./workdir:/workdir
+      - paper_registry_state:/workdir/.paper_registry
+      - ./academia_patches/web_search.py:/app/academia_mcp/tools/web_search.py:ro
+      # - ./academia_patches/settings.py:/app/academia_mcp/settings.py:ro
+      # - ./academia_patches/server.py:/app/academia_mcp/server.py:ro
+      - ./academia_patches/new_search_tools.py:/app/academia_mcp/tools/new_search_tools.py:ro
+      - ./reviewer_patches/__init__.py:/app/academia_mcp/tools/reviewer_patches/__init__.py:ro
+      - ./reviewer_patches/models.py:/app/academia_mcp/tools/reviewer_patches/models.py:ro
+      - ./reviewer_patches/prompts.py:/app/academia_mcp/tools/reviewer_patches/prompts.py:ro
+      - ./reviewer_patches/pdf_processor.py:/app/academia_mcp/tools/reviewer_patches/pdf_processor.py:ro
+      - ./reviewer_patches/review.py:/app/academia_mcp/tools/reviewer_patches/review.py:ro
+      - ./reviewer_patches/batch_review.py:/app/academia_mcp/tools/reviewer_patches/batch_review.py:ro
+      - ./reviewer_patches/faithfulness.py:/app/academia_mcp/tools/reviewer_patches/faithfulness.py:ro
+      - ./reviewer_patches/context_control.py:/app/academia_mcp/tools/reviewer_patches/context_control.py:ro
+      - ./reviewer_patches/eval_pipeline.py:/app/academia_mcp/tools/reviewer_patches/eval_pipeline.py:ro
+      - ./reviewer_patches/a3pr_pipeline.py:/app/academia_mcp/tools/reviewer_patches/a3pr_pipeline.py:ro
+      - ./reviewer_patches/section_parser.py:/app/academia_mcp/tools/reviewer_patches/section_parser.py:ro
+      - ./reviewer_patches/self_critique.py:/app/academia_mcp/tools/reviewer_patches/self_critique.py:ro
+      - ./reviewer_patches/settings.py:/app/academia_mcp/tools/reviewer_patches/settings.py:ro
+      - ./reviewer_patches/arxiv_search.py:/app/academia_mcp/tools/reviewer_patches/arxiv_search.py:ro
+      - ./reviewer_patches/benchmark/iclr_dataset.py:/app/academia_mcp/tools/reviewer_patches/benchmark/iclr_dataset.py:ro
+      - ./reviewer_patches/benchmark/iclr_adapter.py:/app/academia_mcp/tools/reviewer_patches/benchmark/iclr_adapter.py:ro
+      - ./reviewer_patches/benchmark/run_iclr_benchmark.py:/app/academia_mcp/tools/reviewer_patches/benchmark/run_iclr_benchmark.py:ro
+      - ./reviewer_patches/benchmark/data:/app/academia_mcp/tools/reviewer_patches/benchmark/data:ro
+      - ./reviewer_patches/benchmark/output:/app/academia_mcp/tools/reviewer_patches/benchmark/output
+    env_file:
+      - .env
+
+  mle_kit:
+    build:
+      context: ./mle_kit_mcp
+      dockerfile: Dockerfile
+    command: ["python", "-m", "mle_kit_mcp", "--transport", "streamable-http", "--host", "0.0.0.0", "--port", "${MLE_KIT_PORT:-5057}"]
+    ports:
+      - "${MLE_KIT_PORT:-5057}:${MLE_KIT_PORT:-5057}"
+    environment:
+      - WORKSPACE_DIR=/workdir
+      - HOST_WORKSPACE_DIR=${HOST_WORKSPACE_DIR:-${PWD}/workdir}
+      # Hand the local bash sandbox host GPUs ("all", or "0,1"). Empty keeps it
+      # CPU-only, so hosts without a GPU are unaffected. Needs a working
+      # nvidia-container-toolkit on the host; GPU work otherwise goes remote.
+      - LOCAL_GPU_DEVICES=${LOCAL_GPU_DEVICES:-}
+      # Remote-GPU provider selection. Default `vast` keeps the original
+      # behaviour. Set REMOTE_PROVIDER=cloudru or REMOTE_PROVIDER=selectel in
+      # .env (or shell) to switch to a static SSH host.
+      - REMOTE_PROVIDER=${REMOTE_PROVIDER:-vast}
+      - CLOUDRU_SSH_HOST=${CLOUDRU_SSH_HOST:-}
+      - CLOUDRU_SSH_PORT=${CLOUDRU_SSH_PORT:-2222}
+      - CLOUDRU_SSH_USER=${CLOUDRU_SSH_USER:-}
+      - CLOUDRU_SSH_KEY=/root/.ssh/cloudru_key
+      - CLOUDRU_REMOTE_HOME=${CLOUDRU_REMOTE_HOME:-/home/jovyan}
+      # Selectel: static multi-GPU SSH host. SELECTEL_SSH_KEY is the in-container
+      # path the bind-mount below lands the key at; the real key is never here.
+      - SELECTEL_SSH_HOST=${SELECTEL_SSH_HOST:-}
+      - SELECTEL_SSH_PORT=${SELECTEL_SSH_PORT:-22}
+      - SELECTEL_SSH_USER=${SELECTEL_SSH_USER:-}
+      - SELECTEL_SSH_KEY=/root/.ssh/selectel_key
+      - SELECTEL_REMOTE_HOME=${SELECTEL_REMOTE_HOME:-/home/m.mozikov}
+      - SELECTEL_GPU_INDICES=${SELECTEL_GPU_INDICES:-}
+    volumes:
+      - ./workdir:/workdir
+      - /var/run/docker.sock:/var/run/docker.sock
+      # cloud.ru SSH key: bind-mount the host file when set, fall back to a
+      # harmless 0-byte /dev/null when not — Vast users never read this path.
+      - ${CLOUDRU_SSH_KEY_HOST_PATH:-/dev/null}:/root/.ssh/cloudru_key:ro
+      # Selectel SSH key: same pattern — bind-mount the host key when set, fall
+      # back to /dev/null when not (non-Selectel users never read this path).
+      - ${SELECTEL_SSH_KEY_HOST_PATH:-/dev/null}:/root/.ssh/selectel_key:ro
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os,socket; p=int(os.environ.get('MLE_KIT_PORT',5057)); s=socket.socket(); s.settimeout(1); s.connect(('localhost',p)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+    env_file:
+      - .env
+
+  paperbanana-mcp:
+    build:
+      context: .
+      dockerfile: docker/paperbanana-mcp.Dockerfile
+      args:
+        PAPERBANANA_GIT_URL: ${PAPERBANANA_GIT_URL:-https://github.com/llmsresearch/paperbanana.git}
+        PAPERBANANA_GIT_REF: ${PAPERBANANA_GIT_REF:-v0.1.2}
+    ports:
+      - "${PAPERBANANA_PORT:-5060}:5060"
+    environment:
+      - VLM_PROVIDER=${PAPERBANANA_VLM_PROVIDER:-openrouter}
+      - VLM_MODEL=${PAPERBANANA_VLM_MODEL:-google/gemini-3-flash-preview}
+      - IMAGE_PROVIDER=${PAPERBANANA_IMAGE_PROVIDER:-openrouter_imagen}
+      - IMAGE_MODEL=${PAPERBANANA_IMAGE_MODEL:-google/gemini-3-pro-image-preview}
+      - REFINEMENT_ITERATIONS=${PAPERBANANA_REFINEMENT_ITERATIONS:-2}
+      - PAPERBANANA_VLM_TIMEOUT=${PAPERBANANA_VLM_TIMEOUT:-300}
+      - PAPERBANANA_IMAGE_TIMEOUT=${PAPERBANANA_IMAGE_TIMEOUT:-600}
+      - PAPERBANANA_PLOT_EXEC_TIMEOUT=${PAPERBANANA_PLOT_EXEC_TIMEOUT:-180}
+      - OUTPUT_DIR=/workdir/figures/paperbanana
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - WORKSPACE_DIR=/workdir
+    volumes:
+      - ./workdir:/workdir
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s=socket.socket(); s.settimeout(1); s.connect(('localhost', 5060)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+    env_file:
+      - .env
+
+  searxng:
+    image: docker.io/searxng/searxng:latest
+    container_name: holosophus-searxng
+    restart: unless-stopped
+    ports:
+      - "${SEARXNG_PORT:-8181}:8080"
+    volumes:
+      - ./searxng:/etc/searxng:Z
+      - searxng-data:/var/cache/searxng/
+    environment:
+      - SEARXNG_BASE_URL=http://searxng:8080
+    healthcheck:
+      test: ["CMD", "wget", "-q", "--spider", "--proxy=off", "http://127.0.0.1:8080/healthz"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
+
+  searxng-valkey:
+    image: docker.io/valkey/valkey:9-alpine
+    container_name: holosophus-searxng-valkey
+    command: "valkey-server --save 30 1 --loglevel warning"
+    restart: unless-stopped
+    volumes:
+      - searxng-valkey-data:/data/
+
+volumes:
+  paper_registry_state:
+  langfuse_database_data:
+  searxng-data:
+  searxng-valkey-data:
+  writer_tools_state:

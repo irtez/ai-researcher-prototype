@@ -1,0 +1,34 @@
+# Canonical application settings for Claude Code (general and chemistry).
+# Secrets and deployment-specific addresses stay in the process environment.
+cli_env:
+  NODE_TLS_REJECT_UNAUTHORIZED: "1"
+
+mcpServers:
+  alphaxiv:
+    type: http
+    url: https://api.alphaxiv.org/mcp/v1
+  academia:
+    type: http
+    url: http://localhost:5056/mcp
+  mle_kit:
+    type: http
+    url: http://localhost:5057/mcp
+  paperbanana:
+    type: http
+    url: http://localhost:5060/mcp
+  writer_tools:
+    type: http
+    url: http://localhost:5059/mcp
+
+profiles:
+  general: {}
+  chemistry:
+    mcpServers:
+      chem:
+        type: http
+        url: http://localhost:5063/mcp
+        url_env: CHEM_MCP_URL
+      chem_conversions:
+        type: http
+        url: http://localhost:5064/mcp
+        url_env: CHEM_CONVERSIONS_MCP_URL

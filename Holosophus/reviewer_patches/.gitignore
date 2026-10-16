@@ -1,0 +1,37 @@
+# Downloaded datasets
+data/
+Miniset-1K.zip
+ICLR2025-1000/
+
+# Benchmark outputs
+output/
+benchmark/output/run_*/
+benchmark/output/*.jsonl
+benchmark/output/*.json
+!benchmark/output/.gitkeep
+!benchmark/output/README.md
+
+# Golden sets (large files)
+benchmark/golden_set/
+golden/
+
+# Temporary files
+*.tmp
+*.temp
+__pycache__/
+*.pyc
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Logs
+*.log
+logs/

@@ -1,0 +1,583 @@
+# Registered sources. Preparing a table records observed metadata separately.
+version: 1
+datasets:
+  cytotox:
+    title: Cytotox
+    description: Nanoparticle cytotoxicity assays with particle descriptors, cell metadata, and viability
+      readouts.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_1.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/Cytotox
+      config: default
+      split: train
+    preload: false
+    operations:
+    - sql
+    notes: 'Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. '
+    schema:
+    - name: sn
+    - name: material
+    - name: shape
+    - name: coat_functional_group
+    - name: synthesis_method
+    - name: surface_charge
+    - name: size_in_medium_nm
+    - name: zeta_in_medium_mv
+    - name: no_of_cells_cells_well
+    - name: human_animal
+    - name: cell_source
+    - name: cell_tissue
+    - name: cell_morphology
+    - name: cell_age
+    - name: time_hr
+    - name: concentration
+    - name: test
+    - name: test_indicator
+    - name: viability_%
+    - name: doi
+    - name: article_list
+    - name: core_nm
+    - name: hydrodynamic_nm
+    - name: potential_mv
+    - name: cell_type
+    - name: journal_name
+    - name: publisher
+    - name: year
+    - name: title
+    - name: journal_is_oa
+    - name: is_oa
+    - name: oa_status
+    - name: pdf
+    - name: access
+    example_rows:
+    - material: SiO2
+      shape: Sphere
+      coat_functional_group: CTAB
+      surface_charge: Negative
+      size_in_medium_nm: 90.09
+      cell_source: Rat
+      cell_type: PC12
+      time_hr: 12
+      concentration: 1.95
+      test: MTT
+      viability_%: 113.67
+      doi: 10.3109/15376516.2015.1070229
+  seltox:
+    title: SelTox
+    description: Nanoparticle antibacterial screening rows with MIC or zone-of-inhibition measurements.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_2.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/SelTox
+      config: default
+      split: train
+    preload: false
+    operations:
+    - sql
+    notes: 'Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. '
+    schema:
+    - name: sn
+    - name: np
+    - name: coating
+    - name: bacteria
+    - name: mdr
+    - name: strain
+    - name: np_synthesis
+    - name: method
+    - name: mic_np_µg_ml
+    - name: concentration
+    - name: zoi_np_mm
+    - name: np_size_min_nm
+    - name: np_size_max_nm
+    - name: np_size_avg_nm
+    - name: shape
+    - name: time_set_hours
+    - name: zeta_potential_mV
+    - name: solvent_for_extract
+    - name: temperature_for_extract_C
+    - name: duration_preparing_extract_min
+    - name: precursor_of_np
+    - name: concentration_of_precursor_mM
+    - name: hydrodynamic_diameter_nm
+    - name: ph_during_synthesis
+    - name: reference
+    - name: doi
+    - name: article_list
+    - name: journal_name
+    - name: publisher
+    - name: year
+    - name: title
+    - name: journal_is_oa
+    - name: is_oa
+    - name: oa_status
+    - name: pdf
+    - name: access
+    example_rows:
+    - np: Ag
+      bacteria: Enterococcus faecalis
+      np_synthesis: green_synthesis
+      method: MIC
+      mic_np_µg_ml: '32'
+      np_size_avg_nm: 20.0
+      shape: spherical
+      solvent_for_extract: water (deionized)
+      precursor_of_np: AgNO3
+      doi: 10.22034/nmrj.2020.01.006
+      year: 2020
+  synergy:
+    title: Synergy
+    description: Nanoparticle-drug combination records with MIC or ZOI measurements, FIC values, and synergy
+      effects.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_3.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/Synergy
+      config: default
+      split: train
+    preload: false
+    operations:
+    - sql
+    notes: 'Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. '
+    schema:
+    - name: sn
+    - name: NP
+    - name: bacteria
+    - name: strain
+    - name: NP_synthesis
+    - name: drug
+    - name: drug_dose_µg_disk
+    - name: NP_concentration_µg_ml
+    - name: NP_size_min_nm
+    - name: NP_size_max_nm
+    - name: NP_size_avg_nm
+    - name: shape
+    - name: method
+    - name: ZOI_drug_mm_or_MIC _µg_ml
+    - name: error_ZOI_drug_mm_or_MIC_µg_ml
+    - name: ZOI_NP_mm_or_MIC_np_µg_ml
+    - name: error_ZOI_NP_mm_or_MIC_np_µg_ml
+    - name: ZOI_drug_NP_mm_or_MIC_drug_NP_µg_ml
+    - name: error_ZOI_drug_NP_mm_or_MIC_drug_NP_µg_ml
+    - name: fold_increase_in_antibacterial_activity
+    - name: zeta_potential_mV
+    - name: MDR
+    - name: FIC
+    - name: effect
+    - name: reference
+    - name: doi
+    - name: article_list
+    - name: time_hr
+    - name: coating_with_antimicrobial_peptide_polymers
+    - name: combined_MIC
+    - name: peptide_MIC
+    - name: viability_%
+    - name: viability_error
+    - name: journal_name
+    - name: publisher
+    - name: year
+    - name: title
+    - name: journal_is_oa
+    - name: is_oa
+    - name: oa_status
+    - name: pdf
+    - name: access
+    example_rows:
+    - NP: Ag
+      bacteria: Escherichia coli
+      strain: MTCC 443
+      NP_synthesis: chemical_synthesis using sodium borohydride and silver ions
+      method: MIC
+      ZOI_NP_mm_or_MIC_np_µg_ml: 40.0
+      time_hr: 24.0
+      doi: 10.1016/j.actbio.2007.11.006
+      year: 2008
+  nanozymes:
+    title: Nanozymes
+    description: Nanozyme catalytic kinetics with substrate ranges, pH, temperature, and reaction annotations.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_4.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/Nanozymes
+      config: default
+      split: train
+    preload: false
+    operations:
+    - sql
+    notes: 'Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. '
+    schema:
+    - name: formula
+    - name: activity
+    - name: syngony
+    - name: length
+    - name: width
+    - name: depth
+    - name: surface
+    - name: km_value
+    - name: km_unit
+    - name: vmax_value
+    - name: vmax_unit
+    - name: target_source
+    - name: reaction_type
+    - name: c_min
+    - name: c_max
+    - name: c_const
+    - name: c_const_unit
+    - name: ccat_value
+    - name: ccat_unit
+    - name: ph
+    - name: temperature
+    - name: doi
+    - name: pdf
+    - name: access
+    - name: title
+    - name: journal
+    - name: year
+    example_rows:
+    - formula: MnO2
+      activity: oxidase
+      km_value: 0.03
+      km_unit: mM
+      vmax_value: 0.046
+      reaction_type: ABTS
+      c_min: 0.005
+      c_max: 1.0
+      ccat_value: 0.01
+      ccat_unit: mcg/ml
+      ph: 3.8
+      temperature: 25.0
+      doi: 10.1080/03067319.2019.1599875
+      year: 2019
+  benzimidazoles:
+    title: Benzimidazoles
+    description: Benzimidazole antibacterial compounds with SMILES, bacteria labels, and extracted potency
+      values.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_5.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/Benzimidazoles
+      config: default
+      split: train
+    preload: true
+    operations:
+    - sql
+    - structure
+    smiles_field: smiles
+    id_field: compound_id
+    notes: Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. Each record describes
+      a measurement, not a unique molecule. compound_id is local to a publication; retain DOI and row
+      index. target_value can contain ranges, inequalities or decimal commas; interpret it with target_type
+      and target_units. Do not combine unlike units automatically.
+    schema:
+    - name: smiles
+    - name: doi
+    - name: title
+    - name: publisher
+    - name: year
+    - name: access
+    - name: compound_id
+    - name: target_type
+    - name: target_relation
+    - name: target_value
+    - name: target_units
+    - name: bacteria
+    - name: bacteria_unified
+    - name: page_bacteria
+    - name: origin_bacteria
+    - name: section_bacteria
+    - name: subsection_bacteria
+    - name: page_target
+    - name: origin_target
+    - name: section_target
+    - name: subsection_target
+    - name: page_scaffold
+    - name: origin_scaffold
+    - name: page_residue
+    - name: origin_residue
+    - name: pdf
+    example_rows:
+    - smiles: CCOC(=O)C1=C(Cn2cnc3ccccc32)NC(=O)NC1c1ccco1
+      compound_id: 5a
+      target_type: MIC
+      target_relation: '='
+      target_value: '64'
+      target_units: ug/mL
+      bacteria: E. c. 25922
+      bacteria_unified: Escherichia coli
+      doi: 10.1002/cjoc.202200326
+      year: 2022
+  oxazolidinones:
+    title: Oxazolidinones
+    description: Oxazolidinone antibacterial compounds with potency values and bacteria annotations extracted
+      from papers.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_6.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/Oxazolidinones
+      config: default
+      split: train
+    preload: true
+    operations:
+    - sql
+    - structure
+    smiles_field: smiles
+    id_field: compound_id
+    notes: Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. Each record describes
+      a measurement, not a unique molecule. compound_id is local to a publication; retain DOI and row
+      index. target_value can contain ranges, inequalities or decimal commas; interpret it with target_type
+      and target_units. Do not combine unlike units automatically.
+    schema:
+    - name: pdf
+    - name: smiles
+    - name: doi
+    - name: title
+    - name: publisher
+    - name: year
+    - name: access
+    - name: compound_id
+    - name: target_type
+    - name: target_relation
+    - name: target_value
+    - name: target_units
+    - name: bacteria
+    - name: bacteria_name_unified
+    - name: bacteria_info
+    - name: page_bacteria
+    - name: origin_bacteria
+    - name: section_bacteria
+    - name: subsection_bacteria
+    - name: page_target
+    - name: origin_target
+    - name: section_target
+    - name: subsection_target
+    - name: column_prop
+    - name: line_prop
+    - name: page_scaffold
+    - name: origin_scaffold
+    - name: section_scaffold
+    - name: subsection_scaffold
+    - name: page_residue
+    - name: origin_residue
+    - name: section_residue
+    example_rows:
+    - smiles: CC(=O)NC[C@H]1CN(c2ccc(-n3cccc3)c(F)c2)C(=O)O1
+      compound_id: '1'
+      target_type: pMIC
+      target_value: 5,52
+      target_units: mol/l
+      bacteria: methicillin-susceptible S. aureus
+      bacteria_name_unified: Staphylococcus aureus
+      bacteria_info: Methicillin susceptible
+      doi: 10.1080/08927020601188528
+      year: 2007
+  complexes:
+    title: Complexes
+    description: Metal complex records with extracted SMILES, metal identity, and target values.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_7.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/Complexes
+      config: default
+      split: train
+    preload: false
+    operations:
+    - sql
+    notes: 'Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. '
+    schema:
+    - name: pdf
+    - name: doi
+    - name: doi_sourse
+    - name: supplementary
+    - name: title
+    - name: publisher
+    - name: year
+    - name: access
+    - name: compound_id
+    - name: compound_name
+    - name: SMILES
+    - name: SMILES_type
+    - name: metal
+    - name: target
+    - name: page_smiles
+    - name: origin_smiles
+    - name: page_metal
+    - name: origin_metal
+    - name: page_target_value
+    - name: origin_target_value
+    example_rows:
+    - compound_id: L1
+      SMILES: O=C(O)CN(CC(=O)O)Cc1cc([N+](=O)[O-])ccc1O
+      SMILES_type: ligand
+      metal: Ga
+      target: 19,1
+      doi: 10.1021/cr900325h
+      year: 2010
+  eyedrops:
+    title: EyeDrops
+    description: Ophthalmology permeability candidates with SMILES, names, logP, and permeability metadata.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_8.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/EyeDrops
+      config: default
+      split: train
+    preload: false
+    operations:
+    - sql
+    notes: 'Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. '
+    schema:
+    - name: smiles
+    - name: name
+    - name: perm (cm/s)
+    - name: logP
+    - name: doi
+    - name: PMID
+    - name: title
+    - name: publisher
+    - name: year
+    - name: access
+    - name: page
+    - name: origin
+    example_rows:
+    - smiles: NS(=O)(=O)c1ccc(Cl)cc1
+      name: 4-Chlorobenzensulfonamide
+      perm (cm/s): null
+      logP: -4,26
+      PMID: 14609285.0
+      title: Prediction of corneal permeability using artificial neural networks
+      year: 2003
+      origin: table 3
+  co_crystals:
+    title: Co-crystals
+    description: Drug-coformer co-crystal records with component names, SMILES, stoichiometry, and photostability
+      changes.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_9.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/Co-crystals
+      config: default
+      split: train
+    preload: false
+    operations:
+    - sql
+    notes: 'Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. '
+    schema:
+    - name: pdf
+    - name: doi
+    - name: supplementary
+    - name: authors
+    - name: title
+    - name: journal
+    - name: year
+    - name: page
+    - name: access
+    - name: name_cocrystal
+    - name: name_cocrystal_type_file
+    - name: name_cocrystal_page
+    - name: name_cocrystal_origin
+    - name: ratio_cocrystal
+    - name: ratio_cocrystal_page
+    - name: ratio_cocrystal_page.1
+    - name: ratio_cocrystal_origin
+    - name: name_drug
+    - name: name_drug_type_file
+    - name: name_drug_origin
+    - name: name_drug_page
+    - name: SMILES_drug
+    - name: SMILES_drug_type_file
+    - name: SMILES_drug_origin
+    - name: SMILES_drug_page
+    - name: name_coformer
+    - name: name_coformer_type file
+    - name: name_coformer_origin
+    - name: name_coformer_page
+    - name: SMILES_coformer
+    - name: SMILES_coformer_type file
+    - name: SMILES_coformer_origin
+    - name: SMILES_coformer_page
+    - name: photostability_change
+    - name: photostability_change_type_file
+    - name: photostability_change_origin
+    - name: photostability_change_page
+    example_rows:
+    - name_drug: Acacetin
+      SMILES_drug: COc1ccc(-c2cc(=O)c3c(O)cc(O)cc3o2)cc1
+      name_coformer: 4,4'-Bipyridine
+      SMILES_coformer: c1cc(-c2ccncc2)ccn1
+      ratio_cocrystal: '2:1'
+      photostability_change: does not change
+      doi: 10.1016/j.molstruc.2024.139270
+      year: 2024
+  nanomag:
+    title: Nanomag
+    description: Magnetic nanoparticle characterization with SAR, MRI, and magnetometry values.
+    docs_url: https://ai-chem.github.io/ChemX/datasets/dataset_11.html
+    source:
+      type: huggingface
+      repo_id: ai-chem/Nanomag
+      config: default
+      split: train
+    preload: false
+    operations:
+    - sql
+    notes: 'Registered schema and example from the existing ChemX tool description; types and row count
+      are verified when data are prepared. row_idx is added by the SQL interface. '
+    schema:
+    - name: name
+    - name: np_shell_2
+    - name: np_hydro_size
+    - name: xrd_scherrer_size
+    - name: zfc_h_meas
+    - name: htherm_sar
+    - name: mri_r1
+    - name: mri_r2
+    - name: emic_size
+    - name: instrument
+    - name: core_shell_formula
+    - name: np_core
+    - name: np_shell
+    - name: space_group_core
+    - name: space_group_shell
+    - name: squid_h_max
+    - name: fc_field_T
+    - name: squid_temperature
+    - name: squid_sat_mag
+    - name: coercivity
+    - name: squid_rem_mag
+    - name: exchange_bias_shift_Oe
+    - name: vertical_loop_shift_M_vsl_emu_g
+    - name: hc_kOe
+    - name: doi
+    - name: pdf
+    - name: supp
+    - name: journal
+    - name: publisher
+    - name: year
+    - name: title
+    - name: access
+    - name: verification required
+    - name: verified_by
+    - name: verification_date
+    - name: has_mistake_in_matadata
+    - name: comment
+    - name: article_name_folder
+    - name: supp_info_name_folder
+    example_rows:
+    - np_core: Fe1
+      htherm_sar: 250.0
+      emic_size: 12.5
+      squid_h_max: 20.0
+      squid_sat_mag: '211.0'
+      coercivity: '190.0'
+      squid_rem_mag: '50.0'
+      doi: 10.1002/anie.201609477
+      year: 2016

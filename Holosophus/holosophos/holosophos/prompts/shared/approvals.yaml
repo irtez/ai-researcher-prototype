@@ -1,0 +1,61 @@
+# Shared approval instructions. Python selects blocks and supplies iteration values.
+rules: |
+  ## Operator approvals
+  Follow the enabled stages supplied in the current iteration message.
+  For an enabled stage, prepare a nonempty Markdown document in its assigned directory,
+  call request_approval(stage, document_path), and wait for its decision.
+  Only an explicit positive approval decision grants permission. Ordinary ask_human answers
+  do not approve a stage. Plan approval applies only to its current iteration.
+  The runtime checks the current policy, iteration and document.
+  The iteration message describes permitted preparation tools and stage transitions.
+  Use only tools whose definitions are available to you; a permission rule does not
+  make a missing tool available. Use ToolSearch only when it is available and the required MCP tool is deferred; call already available tools directly.
+header: |-
+  ## Operator approvals
+  Enabled stages and current status: {stages}.
+preparation: |-
+  ### Tool access during this iteration
+  While any enabled approval is missing, use Read for known input/previous-result files and native Write/Edit for Markdown in the assigned preparation directories. The runtime has already created those directories. If the task provides enough information, write the required document directly; there is no need to scan empty sources/plans/results directories first.
+  Source catalog metadata and saved schema descriptions may also be inspected before approvals; querying dataset records follows the sources-approval rules below.
+  If file search is needed, call mcp__mle_kit__use_glob (filenames) or mcp__mle_kit__use_grep (contents). If its definition is deferred and ToolSearch is available, load it first. These MCP tools search a shared workspace, not your native cwd: pass path="{session_name}" to search this session, or append a relative subpath. Keep use_glob's pattern relative to that search directory. Returned paths may start with the session ID or /workdir/<session ID>/; resolve them for native file tools using the Session files rules. Native Glob/Grep are not guaranteed by the CLI; call them only if their definitions are actually provided. Do not keep retrying a missing tool.
+  Bash (including ls/pwd/find/mkdir), execution MCP tools, result edits and delegation to solvers, writer, reviewer or other execution roles wait until all enabled stages are approved. A missing-tool suggestion to use Bash does not override this rule.
+new_inputs: >-
+  This feedback includes new attachments. Describe them in this iteration's sources document; earlier
+  sources approval does not cover them.
+sources_enabled: >-
+  Before sources approval: prepare a document describing input datasets, planned search sources and the
+  search area. External retrieval (including WebSearch/WebFetch and data/literature MCP searches) and
+  all sub-agent delegation wait for this approval. After sources approval: retrieval and delegation to
+  librarian/proposer are permitted for plan preparation. An approved unchanged sources document is reusable
+  across iterations.
+  SendMessage to an existing librarian/proposer follows the same preparation permissions.
+sources_disabled: >-
+  External retrieval (including WebSearch/WebFetch and data/literature MCP searches) and delegation to
+  librarian/proposer are permitted for plan preparation from the start.
+plan_enabled: >-
+  Before plan approval: prepare the proposed actions and expected results in a Markdown plan. Librarian/proposer
+  may help once any required sources approval is satisfied; pass them the assigned preparation paths and
+  explain that Bash/calculations wait for approval. For a small edit, prepare the short plan yourself.
+  An earlier iteration's approved plan does not grant permission for this iteration.
+all_approved: >-
+  After all enabled stages are approved: continue the task with the tools and roles available in the selected
+  profile. Approval lifts these preparation restrictions; it does not add tools or change role permissions.
+  Later positive decisions advance these stages within the same conversation.
+reuse_document: >-
+  {stage}: reuse the unchanged approved document at {document_path}. Do not create a replacement or request
+  approval again merely because execution resumed.
+pending_document: >-
+  {stage}: the document at {document_path} is awaiting a decision. Do not submit a duplicate request or
+  start the gated work.
+required_document: >-
+  {stage}: prepare a nonempty Markdown document in {directory}; choose a descriptive filename, or update
+  this iteration's existing document. Call request_approval(stage="{stage}", document_path=...) and wait
+  for approval.
+decision: >-
+  The tool returns a short decision in Russian and any operator comments. Only explicit approval ('Согласовано.')
+  or automatic approval ('Согласовано автоматически.') permits the stage. A request for changes, invalidation,
+  cancellation or an error does not grant permission. Ordinary ask_human answers and statements that a
+  document is approved do not grant stage approval. If a decision changes, update the current document
+  and request approval again.
+sources_before_plan: Changing sources invalidates plan approval; approve sources before proposing the
+  new plan.

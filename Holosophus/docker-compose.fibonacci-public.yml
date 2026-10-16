@@ -1,0 +1,25 @@
+# Docker Compose (v5+) merges the `ports` sequence across -f files by
+# concatenation, not replacement -- a plain override list here would just ADD
+# a second binding alongside the base file's public one, silently leaving the
+# service dual-bound (both 0.0.0.0 and 127.0.0.1). `!override` forces a real
+# replace instead of merge (`!reset` only clears to empty, it can't be
+# followed by a new value).
+services:
+  app:
+    ports: !reset []
+
+  academia:
+    ports: !override
+      - "127.0.0.1:${ACADEMIA_PORT:-5056}:${ACADEMIA_PORT:-5056}"
+
+  mle_kit:
+    ports: !override
+      - "127.0.0.1:${MLE_KIT_PORT:-5057}:${MLE_KIT_PORT:-5057}"
+
+  paperbanana-mcp:
+    ports: !override
+      - "127.0.0.1:${PAPERBANANA_PORT:-5060}:5060"
+
+  searxng:
+    ports: !override
+      - "127.0.0.1:${SEARXNG_PORT:-8080}:8080"

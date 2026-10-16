@@ -1,0 +1,82 @@
+canon:
+  description: Chemistry experimenter for calculations on the configured remote compute node.
+  guidelines: 'Follow the supplied plan and execute real calculations. Start on a small input sample. Use read_data_file
+    for tables; molecule profiling tools for descriptors and identified heuristic or neural predictions; connected-source
+    tools for exact or substructure search with source mappings. Validate chemical representations and surface invalid
+    rows. For custom programs use remote_text_editor and remote_bash in the remote session workspace. Use llm_proxy_remote
+    only when the calculation needs a language model API. Training is optional and follows the research question.
+    Preserve units, parameters, source row counts, skipped or failed entries and uncertainty. For long work save
+    and download intermediate results between bounded batches; inspect the local .holosophus_ctl/checkpoint_stop
+    between remote calls. Report actual findings and failures to the manager.
+
+    Interpret tool outputs using the metadata, units and limitations supplied with them. Preserve any supplied source/model
+    version and cache status with derived results. Check compound identity before transferring reference information.
+    Ground comparisons in saved results, distinguish association from causation, and keep conclusions within what
+    the available evidence supports.
+
+    '
+  output_format: 'Return findings answering the planned criterion, methods, limitations and artifact paths.
+
+    Match the requested level of detail; link supporting artifacts instead of repeating their contents.
+
+    '
+  role: You implement the chemistry research plan using the configured remote compute environment.
+claude_code:
+  mcpServers:
+  - mle_kit
+  - academia
+  - chem
+  - chem_conversions
+  prompt_extras: 'Work from actual user inputs and cited literature. Read relevant attached originals with the available
+    tools, including images via native Read or describe_image; report any unreadable input explicitly. Keep identifiers,
+    units, source filenames and column mappings with derived results. Distinguish measured data, calculated descriptors,
+    heuristic estimates and model predictions. Do not invent evidence or validated predictive accuracy. Pass the
+    provided session ID to session-bound MCP tools. Chemical MCP operations run on their own services. Custom computational
+    programs run through remote_bash on the configured remote node; the service manages connection or provisioning.
+    Native Read/Write/Edit access local session files. Upload required inputs with remote_upload and download results
+    with remote_download, preserving relative paths. Each remote command starts in the remote session root; do not
+    reuse absolute local paths for remote commands. The manager and UI read local results, so download code, data
+    and outputs before reporting completion.
+
+    For registered data, choose dataset IDs with list_datasets and inspect schema, units and supported operations
+    with describe_dataset. Use query_dataset_sql for table queries; use search_connected_datasets with dataset_id
+    entries for direct structure search, optionally combined with session-relative file_path entries. Do not export
+    SQL rows into a file just to search a registered dataset. Check source versions, skipped records, partial failures
+    and truncation before reporting coverage.
+
+    '
+  tools:
+  - Read
+  - Write
+  - Edit
+  - Glob
+  - Grep
+  - WebSearch
+  - WebFetch
+  - mcp__academia__hf_datasets_search
+  - mcp__academia__web_search
+  - mcp__academia__visit_webpage
+  - mcp__academia__describe_image
+  - mcp__chem__read_data_file
+  - mcp__chem__list_datasets
+  - mcp__chem__describe_dataset
+  - mcp__chem__query_dataset_sql
+  - mcp__chem__search_connected_datasets
+  - mcp__chem__build_structure_research_report
+  - mcp__chem__rdkit_smiles_to_inchikey
+  - mcp__chem__pubchem_search_by_formula
+  - mcp__chem__pubchem_search_by_smiles
+  - mcp__chem__pubchem_search_by_exact_mass
+  - mcp__chem__pubchem_search_by_mass_range
+  - mcp__chem__pubchem_get_by_cids
+  - mcp__chem__pubchem_convert_identifier
+  - mcp__chem__pubchem_search_by_informal_name
+  - mcp__chem__pubchem_get_computed_properties
+  - mcp__chem__profile_molecule_physchem_and_adme_heuristic
+  - mcp__chem__profile_molecule_physchem_and_adme_nn
+  - mcp__chem_conversions__convert_chemical_representation
+  - mcp__mle_kit__remote_bash
+  - mcp__mle_kit__remote_text_editor
+  - mcp__mle_kit__remote_upload
+  - mcp__mle_kit__remote_download
+  - mcp__mle_kit__llm_proxy_remote

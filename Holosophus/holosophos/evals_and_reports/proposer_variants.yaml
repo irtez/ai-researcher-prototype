@@ -1,0 +1,186 @@
+# Proposer ablation variants.
+#
+# Each variant inherits from `defaults` and overrides any subset of fields.
+# Per-tool blocks (`extract`, `generate`, `score`) select a component from
+# `evals_and_reports/proposer_components/` and bind it to a model + named prompt from
+# `evals_and_reports/proposer_prompts/`. Setting `model: null` defers to
+# `settings.BITFLIP_MODEL_NAME`.
+#
+# `mode: tool` (default) calls generate+score directly. `mode: agent` (planned)
+# spins up the proposer agent with the tool list in `agent_tools`.
+
+defaults:
+  mode: tool
+  num_proposals: 3
+  max_regeneration_attempts: 1
+  refine_once: false
+  extract:
+    component: default
+    model: null
+    prompt: extract_default
+  generate:
+    component: default
+    model: null
+    prompt: improvement_default
+    system_prompt: improvement_system_default
+    temperature: 1.0
+  score:
+    component: default
+    model: null
+    prompt: score_default
+    system_prompt: score_system_default
+    temperature: 0.0
+  agent_tools: []
+  instruction_template: ""
+
+variants:
+  v0_current:
+    description: Current BitFlip proposer flow with no extra ideation structure.
+    context_template: |
+      Use the task and references only as grounding context. Generate proposals in the standard BitFlip format.
+
+      Task:
+      {instruction}
+
+      References:
+      {references}
+
+      Literature context:
+      {literature_context}
+
+  v_improved_prompts:
+    description: |
+      Improved extraction/generation prompts with the default scorer kept as the
+      measurement ruler. Use this as the fair baseline comparison when the goal
+      is to test whether generated proposals got better rather than whether the
+      judge became stricter.
+    extract:
+      prompt: extract_improved
+    generate:
+      prompt: improvement_improved
+      system_prompt: improvement_system_improved
+    context_template: |
+      Use the task and references only as grounding context. Generate proposals in the standard BitFlip format.
+
+      Task:
+      {instruction}
+
+      References:
+      {references}
+
+      Literature context:
+      {literature_context}
+
+  v_improved_generation_default_scorer:
+    description: |
+      Explicit fair-comparison variant: improved extract + generation prompts,
+      but the exact default score_default and score_system_default prompts from
+      defaults. Prefer this variant against v0_current when deciding whether the
+      proposer generation prompts improved.
+    extract:
+      prompt: extract_improved
+    generate:
+      prompt: improvement_improved
+      system_prompt: improvement_system_improved
+    score:
+      prompt: score_default
+      system_prompt: score_system_default
+    context_template: |
+      Use the task and references only as grounding context. Generate proposals in the standard BitFlip format.
+
+      Task:
+      {instruction}
+
+      References:
+      {references}
+
+      Literature context:
+      {literature_context}
+
+  v_score_prompts_improved:
+    description: |
+      Improved scoring prompt and scoring system prompt with default generation.
+      This isolates judge calibration changes; do not treat its absolute scores
+      as directly comparable to v0_current without reading pairwise/grounding and
+      score distributions.
+    score:
+      prompt: score_improved
+      system_prompt: score_system_improved
+    context_template: |
+      Use the task and references only as grounding context. Generate proposals in the standard BitFlip format.
+
+      Task:
+      {instruction}
+
+      References:
+      {references}
+
+      Literature context:
+      {literature_context}
+
+  v_all_prompts_improved:
+    description: |
+      Improved versions of every prompt whose default counterpart is registered:
+      extract_default, improvement_default, improvement_system_default,
+      score_default, and score_system_default. This is the full candidate for a
+      prompt-stack upgrade.
+    extract:
+      prompt: extract_improved
+    generate:
+      prompt: improvement_improved
+      system_prompt: improvement_system_improved
+    score:
+      prompt: score_improved
+      system_prompt: score_system_improved
+    context_template: |
+      Use the task and references only as grounding context. Generate proposals in the standard BitFlip format.
+
+      Task:
+      {instruction}
+
+      References:
+      {references}
+
+      Literature context:
+      {literature_context}
+
+  v_coi_lite:
+    description: |
+      Chain-of-Ideas lite baseline: explicitly builds a literature chain,
+      transition summaries, and future trend before proposal generation.
+      This is the closest paper-inspired CoI comparison without adding a new
+      retrieval/citation-expansion pipeline.
+    generate:
+      component: coi_lite
+      prompt: improvement_coi_lite
+      system_prompt: improvement_system_coi_lite
+      temperature: 1.0
+    context_template: |
+      Use the task and references as the fixed literature set for a
+      Chain-of-Ideas baseline. Do not retrieve extra papers in this tool-mode
+      eval; infer the most plausible chain only from the supplied context.
+
+      Task:
+      {instruction}
+
+      References:
+      {references}
+
+      Literature context:
+      {literature_context}
+
+  v_agent_baseline:
+    description: |
+      Runs the proposer agent (mode: agent) with the default tool list.
+      Use this as the baseline when comparing variants that ADD new tools to
+      the proposer (e.g. novelty_check, literature_chain_builder).
+    mode: agent
+    agent_tools:
+      - web_search
+      - visit_webpage
+      - document_qa
+      - extract_bitflip_info
+      - generate_research_proposals
+      - score_research_proposals
+      - text_editor
+    instruction_template: ""

@@ -1,0 +1,60 @@
+{
+  "description": "Questions for multi-model consistency analysis. 4 types × 2 questions.",
+  "models": [
+    "deepseek/deepseek-chat-v3-0324",
+    "google/gemini-2.0-flash-001",
+    "openai/gpt-4.1-mini"
+  ],
+  "repeats": 3,
+  "temperature": 0.7,
+  "questions": [
+    {
+      "id": "fact_1",
+      "type": "factual",
+      "text": "What is the capital of Australia?",
+      "expected": "Canberra"
+    },
+    {
+      "id": "fact_2",
+      "type": "factual",
+      "text": "How many planets are in the solar system?",
+      "expected": "8"
+    },
+    {
+      "id": "math_1",
+      "type": "math",
+      "text": "What is 17 * 23? Reply with just the number.",
+      "expected": "391"
+    },
+    {
+      "id": "math_2",
+      "type": "math",
+      "text": "What is the square root of 144? Reply with just the number.",
+      "expected": "12"
+    },
+    {
+      "id": "subj_1",
+      "type": "subjective",
+      "text": "Is pineapple on pizza acceptable? Give a one-sentence answer.",
+      "expected": null
+    },
+    {
+      "id": "subj_2",
+      "type": "subjective",
+      "text": "What is the best programming language for beginners? Give a one-sentence answer.",
+      "expected": null
+    },
+    {
+      "id": "ambig_1",
+      "type": "ambiguous",
+      "text": "Is AI dangerous to humanity? Give a one-sentence answer.",
+      "expected": null
+    },
+    {
+      "id": "ambig_2",
+      "type": "ambiguous",
+      "text": "Should universities require standardized test scores for admission? Give a one-sentence answer.",
+      "expected": null
+    }
+  ]
+}

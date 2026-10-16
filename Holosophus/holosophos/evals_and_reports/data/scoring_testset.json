@@ -1,0 +1,186 @@
+{
+  "description": "Curated test set for scoring prompt evaluation. 3 tiers × 3 proposals = 9 total.",
+  "tiers": {
+    "weak": "Trivial or textbook proposals with zero novelty. Expected overall: 1-3 (on 1-10) or 1 (on 1-5).",
+    "medium": "Reasonable ideas combining known methods in new-ish ways. Expected overall: 4-6 (on 1-10) or 2-3 (on 1-5).",
+    "strong": "Genuinely novel proposals with concrete experiments and clear gap-filling. Expected overall: 7-9 (on 1-10) or 4-5 (on 1-5)."
+  },
+  "proposals": [
+    {
+      "tier": "weak",
+      "proposal": {
+        "proposal_id": 0,
+        "flip": "Fine-tune a pre-trained BERT model on a standard sentiment analysis dataset using the default hyperparameters recommended in the original paper.",
+        "spark": "BERT for sentiment classification",
+        "abstract": "Sentiment analysis is an important task in natural language processing. Pre-trained language models like BERT have shown strong performance on various NLP benchmarks. In this work, we propose to fine-tune BERT-base on the SST-2 sentiment classification dataset. We will use the standard classification head with a learning rate of 2e-5 and train for 3 epochs. We expect to achieve results comparable to those reported in the original BERT paper. This work demonstrates that pre-trained models can be applied to sentiment analysis effectively.",
+        "experiments": [
+          "Fine-tune BERT-base-uncased on SST-2 train split, evaluate on dev split, report accuracy.",
+          "Compare with a simple logistic regression baseline using TF-IDF features."
+        ],
+        "risks_and_limitations": [
+          "Results may not exceed those already reported in the BERT paper.",
+          "Limited to English-language sentiment analysis."
+        ]
+      }
+    },
+    {
+      "tier": "weak",
+      "proposal": {
+        "proposal_id": 1,
+        "flip": "Add dropout layers between fully connected layers of a convolutional neural network to reduce overfitting on small image classification datasets.",
+        "spark": "Dropout regularization for CNNs",
+        "abstract": "Overfitting is a common challenge when training deep neural networks on small datasets. Dropout is a well-established regularization technique that randomly deactivates neurons during training. We propose to apply dropout with a rate of 0.5 between the fully connected layers of a ResNet-18 model trained on CIFAR-10. We will compare the test accuracy with and without dropout to demonstrate its effectiveness. This standard regularization approach should improve generalization on the test set.",
+        "experiments": [
+          "Train ResNet-18 on CIFAR-10 with and without dropout (p=0.5) on FC layers.",
+          "Report test accuracy and training curves for both configurations."
+        ],
+        "risks_and_limitations": [
+          "Dropout is a well-known technique published in 2014; no novelty is claimed.",
+          "Effect may be minimal on CIFAR-10 which is not particularly small."
+        ]
+      }
+    },
+    {
+      "tier": "weak",
+      "proposal": {
+        "proposal_id": 2,
+        "flip": "Use a large language model via its API to generate summaries of long documents by prompting it with the document text and asking for a summary.",
+        "spark": "LLM prompting for summarization",
+        "abstract": "Document summarization is a widely studied NLP task. Recent large language models such as GPT-4 have demonstrated impressive text generation capabilities. We propose to use GPT-4 for document summarization by constructing a prompt that includes the full document text followed by the instruction 'Please summarize the above document in 3 sentences.' We will evaluate the generated summaries on the CNN/DailyMail dataset using ROUGE scores. We hypothesize that GPT-4 will produce high-quality summaries without any fine-tuning or architectural modifications.",
+        "experiments": [
+          "Run GPT-4 zero-shot summarization on 500 articles from CNN/DailyMail test set.",
+          "Compute ROUGE-1, ROUGE-2, and ROUGE-L scores against reference summaries."
+        ],
+        "risks_and_limitations": [
+          "This is a direct application of an existing API with no methodological contribution.",
+          "API costs may be significant for the full test set."
+        ]
+      }
+    },
+    {
+      "tier": "medium",
+      "proposal": {
+        "proposal_id": 3,
+        "flip": "Instead of training separate models for each target language, create a shared subword vocabulary across languages and add a cross-lingual alignment loss that pulls parallel sentence representations together in the shared embedding space. This enables zero-shot cross-lingual transfer without parallel data at inference time.",
+        "spark": "Aligned subwords for cross-lingual transfer",
+        "abstract": "Cross-lingual transfer learning typically relies on multilingual pre-training or parallel corpora for fine-tuning. We propose a lightweight alternative: constructing a shared subword vocabulary using BPE trained on concatenated multilingual corpora, combined with a contrastive alignment loss during fine-tuning that aligns sentence representations of parallel pairs. At inference time, the model transfers to unseen languages without requiring any parallel data. We evaluate on XNLI (15 languages) and UDPOS (33 languages), comparing against mBERT and XLM-R baselines. Our approach adds only the alignment loss to standard fine-tuning, requiring minimal additional compute. Preliminary experiments on 3 language pairs show consistent improvements of 1-3% accuracy over mBERT zero-shot transfer.",
+        "experiments": [
+          "Experiment 1: Fine-tune XLM-R-base on English MNLI with and without alignment loss, evaluate zero-shot on all 15 XNLI languages. Metric: accuracy per language and average.",
+          "Experiment 2: Vary the number of parallel pairs used for alignment (1K, 10K, 100K) to measure data efficiency.",
+          "Experiment 3: Ablation on alignment loss weight (0.01, 0.1, 0.5, 1.0).",
+          "Experiment 4: Transfer to UDPOS tagging to test cross-task generalization."
+        ],
+        "risks_and_limitations": [
+          "The alignment approach is related to prior work on cross-lingual word embedding alignment (Conneau et al., 2018) and may offer only incremental improvement.",
+          "Shared BPE vocabulary may underrepresent low-resource languages.",
+          "Parallel data is still required during training, limiting applicability to truly zero-resource scenarios."
+        ]
+      }
+    },
+    {
+      "tier": "medium",
+      "proposal": {
+        "proposal_id": 4,
+        "flip": "Instead of training code generation models on randomly shuffled data, sort training examples by estimated difficulty (measured by cyclomatic complexity and solution length) and train in a curriculum from easy to hard. This curriculum approach should help the model learn basic programming patterns before tackling complex logic.",
+        "spark": "Difficulty curriculum for code generation",
+        "abstract": "Code generation models are typically trained on randomly ordered examples, ignoring the natural progression from simple to complex programming tasks. We propose a curriculum learning strategy where training samples are sorted by difficulty, estimated using a composite score of cyclomatic complexity, lines of code, and number of unique API calls. The model is exposed to simple functions first (e.g., string manipulation, basic arithmetic) and gradually progresses to complex algorithms (e.g., dynamic programming, graph traversal). We evaluate on HumanEval and MBPP using CodeLlama-7B as the base model, comparing random ordering against our difficulty-based curriculum. We also test an anti-curriculum (hard-to-easy) to isolate the effect of ordering direction.",
+        "experiments": [
+          "Experiment 1: Fine-tune CodeLlama-7B with random vs. easy-to-hard vs. hard-to-easy ordering on a filtered subset of The Stack. Evaluate pass@1 and pass@10 on HumanEval and MBPP.",
+          "Experiment 2: Compare three difficulty metrics (cyclomatic complexity alone, LOC alone, composite) to find the best curriculum signal.",
+          "Experiment 3: Vary curriculum pacing (linear ramp, step function, exponential) to find optimal scheduling.",
+          "Experiment 4: Analysis of which problem categories (string, math, DP, graph) benefit most from curriculum."
+        ],
+        "risks_and_limitations": [
+          "Curriculum learning is a known technique (Bengio et al., 2009); the novelty is specifically in difficulty estimation for code, which has been partially explored.",
+          "Difficulty estimation may be noisy — cyclomatic complexity does not always correlate with conceptual difficulty.",
+          "Results may not transfer to larger models where curriculum effects are weaker."
+        ]
+      }
+    },
+    {
+      "tier": "medium",
+      "proposal": {
+        "proposal_id": 5,
+        "flip": "Instead of treating named entity recognition (NER) and relation extraction (RE) as separate pipeline stages, train a single shared encoder with task-specific classification heads and a joint loss function that allows gradient signals from RE to improve entity representations. This avoids error propagation from NER to RE.",
+        "spark": "Joint NER-RE with shared encoder",
+        "abstract": "Traditional information extraction pipelines perform NER first, then RE on detected entities, causing error propagation. We propose a unified architecture with a shared transformer encoder, a token-level CRF head for NER, and a span-pair classifier for RE, trained jointly with a weighted sum of both losses. The key insight is that relation labels provide implicit supervision for entity boundaries — if two spans participate in a relation, they are likely valid entities. We evaluate on ACE2005, CoNLL04, and SciERC, comparing against pipeline baselines (SpanBERT+RE) and recent joint models (PFN, OneRel). Our architecture is deliberately simple to isolate the effect of joint training from architectural complexity.",
+        "experiments": [
+          "Experiment 1: Compare pipeline (separate NER→RE) vs. joint training on ACE2005, CoNLL04, SciERC. Metrics: entity F1, relation F1, relation F1 (strict).",
+          "Experiment 2: Ablation on loss weighting (NER:RE ratios of 1:1, 2:1, 1:2).",
+          "Experiment 3: Error analysis — measure how many RE errors are caused by NER errors in pipeline vs. joint.",
+          "Experiment 4: Scale test — does joint training still help with RoBERTa-large vs. RoBERTa-base?"
+        ],
+        "risks_and_limitations": [
+          "Joint NER+RE models have been extensively studied (Zhong & Chen 2021, Wang et al. 2020); the shared encoder approach is not fundamentally new.",
+          "Joint training can cause task interference if the NER and RE gradients conflict.",
+          "The CRF head for NER may slow training compared to simple softmax."
+        ]
+      }
+    },
+    {
+      "tier": "strong",
+      "proposal": {
+        "proposal_id": 6,
+        "flip": "Instead of treating tool use as flat function calling, represent tool capabilities as a compositional skill graph where nodes are atomic skills (e.g., 'read file', 'parse JSON', 'call API') and edges encode composition constraints (e.g., 'parse JSON requires text input'). At inference time, the LLM performs graph-based planning: it decomposes a user query into a subgraph of required skills, verifies the subgraph is valid (all edge constraints satisfied), and executes nodes in topological order. This enables zero-shot orchestration of unseen tool combinations that the model was never explicitly trained on.",
+        "spark": "Compositional skill graphs for tool orchestration",
+        "abstract": "Large language models can use external tools, but current approaches treat each tool call independently, relying on the model to implicitly reason about tool composition. This fails on complex tasks requiring coordinated multi-tool workflows, especially for tool combinations not seen during training. We propose Skill Graphs: a framework where tool capabilities are decomposed into atomic skills connected by typed composition edges. Given a user query, an LLM planner selects a subgraph of skills, a constraint checker validates the composition (type compatibility, dependency ordering), and an executor runs the subgraph in topological order with intermediate results passed along edges. The skill graph is constructed once per tool suite and requires no additional training. We evaluate on ToolBench (single-tool and multi-tool subsets), a new ToolCompose benchmark of 200 compositional queries requiring 3-7 tool chains, and API-Bank. We compare against ReAct, Toolformer, and AnyTool. Our approach should particularly excel on compositional queries, where implicit reasoning about tool compatibility is the bottleneck. We release the ToolCompose benchmark and the skill graph construction pipeline.",
+        "experiments": [
+          "Experiment 1: Evaluate on ToolBench single-tool (baseline), multi-tool (compositional), and our ToolCompose benchmark. Metrics: task success rate, tool selection accuracy, execution order correctness.",
+          "Experiment 2: Zero-shot composition test — hold out 30% of tool combinations from the skill graph during development, evaluate whether the planner can compose them correctly at test time.",
+          "Experiment 3: Ablation on graph components — (a) full system, (b) without constraint checker, (c) without typed edges (flat tool list), (d) without topological execution (free ordering).",
+          "Experiment 4: Scaling analysis — vary skill graph size (10, 50, 200, 500 skills) and measure planning accuracy vs. latency trade-off.",
+          "Experiment 5: Human evaluation — 50 compositional queries rated by 3 annotators for correctness and efficiency."
+        ],
+        "risks_and_limitations": [
+          "Constructing accurate skill graphs requires manual specification or reliable automated decomposition of tools into atomic skills, which may not always be feasible.",
+          "The graph-based planner adds latency compared to direct function calling for simple single-tool queries.",
+          "Typed composition edges assume tools have well-defined input/output schemas, which is not universal."
+        ]
+      }
+    },
+    {
+      "tier": "strong",
+      "proposal": {
+        "proposal_id": 7,
+        "flip": "Instead of training scientific claim verifiers on fixed evidence, create an adversarial curriculum where a generator model produces increasingly sophisticated counter-evidence (paraphrased contradictions, out-of-context citations, statistical misrepresentations) and the verifier must learn to detect them. This co-evolutionary training forces the verifier to develop deeper reasoning about evidence quality rather than relying on surface-level textual entailment.",
+        "spark": "Adversarial curriculum for claim verification",
+        "abstract": "Scientific claim verification systems are vulnerable to sophisticated misinformation — claims that are subtly wrong but supported by plausible-sounding evidence. Current training data contains mostly obvious contradictions, leaving models brittle against nuanced falsehoods. We propose Adversarial Scientific Claim Training (ASCT): a curriculum where a generator LLM creates counter-evidence of escalating difficulty. Level 1: simple negation of claims. Level 2: paraphrased contradictions with scientific jargon. Level 3: real papers cited out of context to appear supportive. Level 4: statistically valid-looking but fabricated experimental results. The verifier is trained against each level, advancing when accuracy exceeds 85%. We evaluate on SciFact, HealthVer, COVIDFact, and a new AdversarialSciFact benchmark of 500 expert-annotated adversarial claim-evidence pairs. We compare against SciBERT, FactKB, and MultiVerS. We hypothesize that ASCT-trained models will show significantly higher robustness on adversarial inputs while maintaining accuracy on standard benchmarks.",
+        "experiments": [
+          "Experiment 1: Train DeBERTa-v3-large with standard SciFact training vs. ASCT curriculum. Evaluate on SciFact, HealthVer, COVIDFact (standard) and AdversarialSciFact (adversarial). Metrics: label accuracy, F1, adversarial robustness gap.",
+          "Experiment 2: Curriculum ablation — compare full 4-level curriculum vs. training on all levels simultaneously vs. random mixing. Measure final accuracy on each difficulty level.",
+          "Experiment 3: Generator analysis — compare counter-evidence from GPT-4, Llama-3-70B, and Mixtral as generators. Which produces the most useful adversarial training signal?",
+          "Experiment 4: Transfer test — does ASCT training on SciFact improve robustness on HealthVer and COVIDFact without domain-specific fine-tuning?",
+          "Experiment 5: Human adversarial evaluation — 3 domain experts attempt to fool ASCT-trained vs. baseline models with hand-crafted adversarial evidence."
+        ],
+        "risks_and_limitations": [
+          "The generator may produce adversarial examples that are too easy or too hard, requiring careful calibration of difficulty levels.",
+          "Adversarial training can sometimes hurt performance on clean (non-adversarial) test sets if the model over-adapts to adversarial patterns.",
+          "The AdversarialSciFact benchmark creation requires significant expert annotation effort.",
+          "Ethical concern: the generator learns to produce convincing scientific misinformation, which could be misused."
+        ]
+      }
+    },
+    {
+      "tier": "strong",
+      "proposal": {
+        "proposal_id": 8,
+        "flip": "Instead of allocating the same computational budget to every input, train a difficulty-aware router that predicts the minimum model capacity needed for each query and dynamically routes it to an appropriately-sized sub-network. Easy queries (factual lookups, simple formatting) use only early layers, while hard queries (multi-step reasoning, ambiguous inputs) use the full network. The router is trained jointly with the main model using a compute-efficiency loss that penalizes over-allocation.",
+        "spark": "Adaptive compute via difficulty-aware routing",
+        "abstract": "Current LLM inference uses fixed computational cost per token regardless of query difficulty, wasting resources on trivial inputs and potentially under-serving complex ones. We propose Difficulty-Aware Adaptive Routing (DAAR): a lightweight router network attached to a transformer that, after processing the first few layers, predicts a difficulty score and selects an exit point. The router is trained with three losses: (1) task loss from the exit point, (2) a compute penalty proportional to layers used, and (3) a consistency loss ensuring the early-exit prediction matches the full-model prediction on easy inputs. We implement DAAR on Llama-3-8B and evaluate on a diverse benchmark spanning 5 difficulty levels: TriviaQA (easy), HellaSwag (medium), MMLU (medium-hard), GSM8K (hard), and MATH (very hard). Key metrics: accuracy vs. average FLOPs per query. We compare against early-exit baselines (CALM, SkipDecode) and fixed compute budgets. Our hypothesis: DAAR matches full-model accuracy while using 40-60% fewer average FLOPs, with the savings concentrated on easy queries.",
+        "experiments": [
+          "Experiment 1: Train DAAR on Llama-3-8B with exits after layers {4, 8, 16, 24, 32}. Evaluate accuracy vs. FLOPs trade-off on each benchmark. Compare Pareto frontiers against CALM and SkipDecode.",
+          "Experiment 2: Router accuracy analysis — what fraction of queries does the router correctly classify by difficulty? Visualize the learned difficulty distribution per benchmark.",
+          "Experiment 3: Ablation on loss components — (a) full DAAR, (b) without compute penalty, (c) without consistency loss, (d) without joint training (frozen router).",
+          "Experiment 4: Throughput benchmark — measure actual wall-clock speedup on A100 GPU with batched inference, accounting for routing overhead.",
+          "Experiment 5: OOD generalization — train DAAR on a mixture of 3 benchmarks, test on 2 held-out benchmarks. Does the router generalize its difficulty estimation?"
+        ],
+        "risks_and_limitations": [
+          "The router itself adds latency; if the routing decision is slow, savings on easy queries may be negated.",
+          "Early exit may produce qualitatively different outputs (not just lower accuracy but different style/format), which could confuse downstream systems.",
+          "Joint training of router and model is unstable in practice and may require careful learning rate scheduling.",
+          "The compute penalty hyperparameter requires tuning per deployment scenario (latency-sensitive vs. throughput-sensitive)."
+        ]
+      }
+    }
+  ]
+}

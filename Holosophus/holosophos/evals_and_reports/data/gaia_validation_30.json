@@ -1,0 +1,242 @@
+[
+  {
+    "idx": 0,
+    "question": "A paper about AI regulation that was originally submitted to arXiv.org in June 2022 shows a figure with three axes, where each axis has a label word at both ends. Which of these words is used to describe a type of society in a Physics and Society article submitted to arXiv.org on August 11, 2016?",
+    "answer": "egalitarian",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 1,
+    "question": "I’m researching species that became invasive after people who kept them as pets released them. There’s a certain species of fish that was popularized as a pet by being the main character of the movie Finding Nemo. According to the USGS, where was this fish found as a nonnative species, before the year 2020? I need the answer formatted as the five-digit zip codes of the places the species was found, separated by commas if there is more than one place.",
+    "answer": "34689",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 2,
+    "question": "If we assume all articles published by Nature in 2020 (articles, only, not book reviews/columns, etc) relied on statistical significance to justify their findings and they on average came to a p-value of 0.04, how many papers would be incorrect as to their claims of statistical significance? Round the value up to the next integer.",
+    "answer": "41",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 3,
+    "question": "In Unlambda, what exact charcter or text needs to be added to correct the following code to output \"For penguins\"? If what is needed is a character, answer with the name of the character. If there are different names for the character, use the shortest. The text location is not needed. Code:\n\n`r```````````.F.o.r. .p.e.n.g.u.i.n.si",
+    "answer": "backtick",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 4,
+    "question": "If Eliud Kipchoge could maintain his record-making marathon pace indefinitely, how many thousand hours would it take him to run the distance between the Earth and the Moon its closest approach? Please use the minimum perigee value on the Wikipedia page for the Moon when carrying out your calculation. Round your result to the nearest 1000 hours and do not use any comma separators if necessary.",
+    "answer": "17",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 5,
+    "question": "The attached spreadsheet shows the inventory for a movie and video game rental store in Seattle, Washington. What is the title of the oldest Blu-Ray recorded in this spreadsheet? Return it as appearing in the spreadsheet.",
+    "answer": "Time-Parking 2: Parallel Universe",
+    "level": "2",
+    "has_file": true,
+    "file_path": "2023/validation/32102e3e-d12a-4209-9163-7b3a104efe5d.xlsx"
+  },
+  {
+    "idx": 6,
+    "question": "How many studio albums were published by Mercedes Sosa between 2000 and 2009 (included)? You can use the latest 2022 version of english wikipedia.",
+    "answer": "3",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 7,
+    "question": "The object in the British Museum's collection with a museum number of 2012,5015.17 is the shell of a particular mollusk species. According to the abstract of a research article published in Science Advances in 2021, beads made from the shells of this species were found that are at least how many thousands of years old?",
+    "answer": "142",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 8,
+    "question": "According to github, when was Regression added to the oldest closed numpy.polynomial issue that has the Regression label in MM/DD/YY?",
+    "answer": "04/15/18",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 9,
+    "question": "Here's a fun riddle that I think you'll enjoy.\n\nYou have been selected to play the final round of the hit new game show \"Pick That Ping-Pong\". In this round, you will be competing for a large cash prize. Your job will be to pick one of several different numbered ping-pong balls, and then the game will commence. The host describes how the game works.\n\nA device consisting of a winding clear ramp and a series of pistons controls the outcome of the game. The ramp feeds balls onto a platform. The platform has room for three ping-pong balls at a time. The three balls on the platform are each aligned with one of three pistons. At each stage of the game, one of the three pistons will randomly fire, ejecting the ball it strikes. If the piston ejects the ball in the first position on the platform the balls in the second and third position on the platform each advance one space, and the next ball on the ramp advances to the third position. If the piston ejects the ball in the second position, the ball in the first position is released and rolls away, the ball in the third position advances two spaces to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform. If the piston ejects the ball in the third position, the ball in the first position is released and rolls away, the ball in the second position advances one space to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform.\n\nThe ramp begins with 100 numbered ping-pong balls, arranged in ascending order from 1 to 100. The host activates the machine and the first three balls, numbered 1, 2, and 3, advance to the platform. Before the random firing of the pistons begins, you are asked which of the 100 balls you would like to pick. If your pick is ejected by one of the pistons, you win the grand prize, $10,000.\n\nWhich ball should you choose to maximize your odds of winning the big prize? Please provide your answer as the number of the ball selected.",
+    "answer": "3",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 10,
+    "question": "In July 2, 1959 United States standards for grades of processed fruits, vegetables, and certain other products listed as dehydrated, consider the items in the \"dried and dehydrated section\" specifically marked as dehydrated along with any items in the Frozen/Chilled section that contain the whole name of the item, but not if they're marked Chilled. As of August 2023, what is the percentage (to the nearest percent) of those standards that have been superseded by a new version since the date given in the 1959 standards?",
+    "answer": "86",
+    "level": "3",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 11,
+    "question": "Using the Biopython library in Python, parse the PDB file of the protein identified by the PDB ID 5wb7 from the RCSB Protein Data Bank. Calculate the distance between the first and second atoms as they are listed in the PDB file. Report the answer in Angstroms, rounded to the nearest picometer.",
+    "answer": "1.456",
+    "level": "2",
+    "has_file": true,
+    "file_path": "2023/validation/7dd30055-0198-452e-8c25-f73dbe27dcb8.pdb"
+  },
+  {
+    "idx": 12,
+    "question": "What are the EC numbers of the two most commonly used chemicals for the virus testing method in the paper about SPFMV and SPCSV in the Pearl Of Africa from 2016? Return the semicolon-separated numbers in the order of the alphabetized chemicals.",
+    "answer": "3.1.3.1; 1.11.1.7",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 13,
+    "question": "In April of 1977, who was the Prime Minister of the first place mentioned by name in the Book of Esther (in the New International Version)?",
+    "answer": "Morarji Desai",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 14,
+    "question": "What's the last line of the rhyme under the flavor name on the headstone visible in the background of the photo of the oldest flavor's headstone in the Ben & Jerry's online flavor graveyard as of the end of 2022?",
+    "answer": "So we had to let it die.",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 15,
+    "question": "Use density measures from the chemistry materials licensed by Marisa Alviar-Agnew & Henry Agnew under the CK-12 license in LibreText's Introductory Chemistry materials as compiled 08/21/2023.\n\nI have a gallon of honey and a gallon of mayonnaise at 25C. I remove one cup of honey at a time from the gallon of honey. How many times will I need to remove a cup to have the honey weigh less than the mayonaise? Assume the containers themselves weigh the same.",
+    "answer": "6",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 16,
+    "question": "What was the volume in m^3 of the fish bag that was calculated in the University of Leicester paper \"Can Hiccup Supply Enough Fish to Maintain a Dragon’s Diet?\"",
+    "answer": "0.1777",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 17,
+    "question": "What is the average number of pre-2020 works on the open researcher and contributor identification pages of the people whose identification is in this file?",
+    "answer": "26.4",
+    "level": "3",
+    "has_file": true,
+    "file_path": "2023/validation/bec74516-02fc-48dc-b202-55e78d0e17cf.jsonld"
+  },
+  {
+    "idx": 18,
+    "question": "In the video https://www.youtube.com/watch?v=L1vXCYZAYYM, what is the highest number of bird species to be on camera simultaneously?",
+    "answer": "3",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 19,
+    "question": "Of the authors (First M. Last) that worked on the paper \"Pie Menus or Linear Menus, Which Is Better?\" in 2015, what was the title of the first paper authored by the one that had authored prior papers?",
+    "answer": "Mapping Human Oriented Information to Software Agents for Online Systems Usage",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 20,
+    "question": "When you take the average of the standard population deviation of the red numbers and the standard sample deviation of the green numbers in this image using the statistics module in Python 3.11, what is the result rounded to the nearest three decimal points?",
+    "answer": "17.056",
+    "level": "2",
+    "has_file": true,
+    "file_path": "2023/validation/df6561b2-7ee5-4540-baab-5095f742716a.png"
+  },
+  {
+    "idx": 21,
+    "question": "Assuming scientists in the famous youtube video The Thinking Machine (Artificial Intelligence in the 1960s) were interviewed the same year, what is the name of the scientist predicting the sooner thinking machines or robots? Answer using the format First name Last name",
+    "answer": "Claude Shannon",
+    "level": "3",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 22,
+    "question": "In Series 9, Episode 11 of Doctor Who, the Doctor is trapped inside an ever-shifting maze. What is this location called in the official script for the episode? Give the setting exactly as it appears in the first scene heading.",
+    "answer": "THE CASTLE",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 23,
+    "question": "In terms of geographical distance between capital cities, which 2 countries are the furthest from each other within the ASEAN bloc according to wikipedia? Answer using a comma separated list, ordering the countries by alphabetical order.",
+    "answer": "Indonesia, Myanmar",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 24,
+    "question": "In the NCATS PubChem compound database for Food Additive Status classification, find the compound that has a molecular weight of 100 g/mol or less, 6 heavy atoms, 1 or fewer hydrogen bond acceptors, and a complexity between 10 and 15. Of the shared gene-chemical co-occurrences between its two possible enzyme transformations, what is the PubChem CID of the heaviest by molecular weight?",
+    "answer": "4192",
+    "level": "3",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 25,
+    "question": "I need to fact-check a citation. This is the citation from the bibliography:\n\nGreetham, David. \"Uncoupled: OR, How I Lost My Author(s).\" Textual Cultures: Texts, Contexts, Interpretation, vol. 3 no. 1, 2008, p. 45-46. Project MUSE, doi:10.2979/tex.2008.3.1.44.\n\nAnd this is the in-line citation:\n\nOur relationship with the authors of the works we read can often be “obscured not by a \"cloak of print\" but by the veil of scribal confusion and mis-transmission” (Greetham 45-46).\n\nDoes the quoted text match what is actually in the article? If Yes, answer Yes, otherwise, give me the word in my citation that does not match with the correct one (without any article).",
+    "answer": "cloak",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 26,
+    "question": "Which contributor to the version of OpenCV where support was added for the Mask-RCNN model has the same name as a former Chinese head of government when the names are transliterated to the Latin alphabet?",
+    "answer": "Li Peng",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 27,
+    "question": "What integer-rounded percentage of the total length of the harlequin shrimp recorded in Omar Valencfia-Mendez 2017 paper was the sea star fed to the same type of shrimp in G. Curt Fiedler's 2002 paper?",
+    "answer": "22",
+    "level": "3",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 28,
+    "question": "An office held a Secret Santa gift exchange where each of its twelve employees was assigned one other employee in the group to present with a gift. Each employee filled out a profile including three likes or hobbies. On the day of the gift exchange, only eleven gifts were given, each one specific to one of the recipient's interests. Based on the information in the document, who did not give a gift?",
+    "answer": "Fred",
+    "level": "1",
+    "has_file": true,
+    "file_path": "2023/validation/cffe0e32-c9a6-4c52-9877-78ceb4aaa9fb.docx"
+  },
+  {
+    "idx": 29,
+    "question": "What is the maximum length in meters of #9 in the first National Geographic short on YouTube that was ever released according to the Monterey Bay Aquarium website? Just give the number.",
+    "answer": "1.8",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  }
+]

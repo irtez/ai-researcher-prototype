@@ -1,0 +1,63 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "mle-kit-mcp"
+version = "1.2.8"
+description = "MCP server that provides different tools for MLE"
+readme = "README.md"
+authors = [
+    {name = "Ilya Gusev", email = "phoenixilya@gmail.com"}
+]
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    # Upper bounds pin the majors: mcp 2.0 removed `mcp.server.fastmcp` (server.py imports
+    # FastMCP from there) and openai 3.0 is an unvetted major. There is no uv.lock here, so a
+    # fresh build floats to latest — these caps keep it reproducible against the known-good set
+    # (mcp 1.28.1 / openai 2.46.0). Drop a cap only after porting the code to the new major.
+    "mcp>=1.9.2,<2",
+    "fire>=0.7.0",
+    "docker>=7.1.0",
+    "vastai-sdk==0.1.16",
+    "openai>=1.102.0,<3",
+    "fastapi>=0.116.1",
+    "pydantic-settings>=2.4.0",
+]
+
+[dependency-groups]
+dev = [
+    "black==25.1.0",
+    "mypy==1.16.0",
+    "flake8==7.2.0",
+    "pytest>=8.4.1",
+]
+
+[project.urls]
+Homepage = "https://github.com/IlyaGusev/mle_kit_mcp"
+
+[project.scripts]
+mle_kit_mcp = "mle_kit_mcp:main"
+
+[[tool.mypy.overrides]]
+module = "*"
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["mle_kit_mcp*"]
+
+[tool.setuptools.package-data]
+"mle_kit_mcp" = ["py.typed"]
+"mle_kit_mcp.tools" = ["py.typed"]
+
+[[tool.mypy.overrides]]
+module = "pydantic.*"
+follow_imports = "skip"
+

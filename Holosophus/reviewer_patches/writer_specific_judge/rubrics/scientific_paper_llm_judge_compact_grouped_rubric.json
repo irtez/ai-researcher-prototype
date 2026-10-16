@@ -1,0 +1,1302 @@
+{
+  "grouped_rubric_id": "scientific_paper_llm_judge_compact_grouped_v1",
+  "version": "0.1.0",
+  "language": "ru",
+  "source_rubric_id": "scientific_paper_llm_judge_v1",
+  "description": "Более компактная группировка рубрики для LLM-as-a-judge. Группы крупнее: обычно 3–6 критериев на один вызов. Цель — уменьшить число LLM-вызовов, сохранив смысловую близость критериев.",
+  "score_scale": {
+    "type": "ordinal",
+    "allowed_values": [
+      0,
+      1,
+      2,
+      "N/A"
+    ],
+    "labels": {
+      "0": "absent_or_poor",
+      "1": "partial_or_incomplete",
+      "2": "good_or_sufficient",
+      "N/A": "not_applicable"
+    },
+    "global_description": {
+      "0": "Критерий отсутствует, не выполнен или выполнен плохо.",
+      "1": "Критерий выполнен частично, неполно или с серьёзными пробелами.",
+      "2": "Критерий выполнен хорошо, достаточно для доверия или проверки.",
+      "N/A": "Критерий неприменим к данному типу статьи."
+    }
+  },
+  "per_group_output_schema": {
+    "group_id": "string",
+    "group_name": "string",
+    "criterion_results": [
+      {
+        "criterion_id": "string",
+        "score": "0 | 1 | 2 | N/A",
+        "evidence": "string",
+        "comment": "string",
+        "missing_info": [
+          "string"
+        ],
+        "severity": "minor | major | critical | none",
+        "confidence": "low | medium | high"
+      }
+    ],
+    "group_summary": "string"
+  },
+  "important_prompt_rules": [
+    "Оценивай только критерии текущей группы.",
+    "Не выставляй общий score группе внутри LLM-ответа.",
+    "Возвращай отдельный score для каждого criterion_id.",
+    "Не переноси впечатление от одного критерия на другой.",
+    "Если информации недостаточно, ставь 1 или 0 согласно rubric, а не додумывай.",
+    "Для inverted risk критериев помни: 0 = высокий риск, 2 = риск маловероятен."
+  ],
+  "groups": [
+    {
+      "group_id": "CU01_framing_contribution",
+      "module_id": "universal_scientific_quality",
+      "group_name": "Framing, motivation, contribution and novelty",
+      "criteria": [
+        "problem_clarity",
+        "motivation_strength",
+        "research_question_clarity",
+        "contribution_clarity",
+        "novelty_justification"
+      ],
+      "recommended_source_sections": [
+        "abstract",
+        "introduction",
+        "contributions",
+        "conclusion"
+      ],
+      "why_grouped": "Все критерии отвечают на вопрос: что исследуется, зачем это важно и что нового заявляют авторы.",
+      "criterion_definitions": [
+        {
+          "id": "problem_clarity",
+          "name": "Ясно ли сформулирована проблема?",
+          "category": "problem_and_motivation",
+          "question": "Понятно ли, какую проблему решает статья?",
+          "score_descriptions": {
+            "0": "Проблема не сформулирована или непонятно, что именно решается.",
+            "1": "Проблема есть, но описана слишком широко или размыто.",
+            "2": "Проблема сформулирована конкретно, с понятным контекстом и границами."
+          }
+        },
+        {
+          "id": "motivation_strength",
+          "name": "Обоснована ли важность проблемы?",
+          "category": "problem_and_motivation",
+          "question": "Показывают ли авторы, почему проблема важна?",
+          "score_descriptions": {
+            "0": "Авторы не объясняют, почему проблема важна.",
+            "1": "Важность заявлена, но аргументы общие.",
+            "2": "Важность хорошо обоснована: практическая, теоретическая, методологическая или социальная."
+          }
+        },
+        {
+          "id": "research_question_clarity",
+          "name": "Есть ли явная цель или research question?",
+          "category": "problem_and_motivation",
+          "question": "Можно ли одним предложением сформулировать, какой вопрос исследует статья?",
+          "score_descriptions": {
+            "0": "Цель исследования неясна.",
+            "1": "Цель угадывается, но не сформулирована явно или строго.",
+            "2": "Цель или research question сформулированы явно и проверяемо."
+          }
+        },
+        {
+          "id": "contribution_clarity",
+          "name": "Ясно ли перечислены вклады статьи?",
+          "category": "contribution_and_novelty",
+          "question": "Понятно ли, что именно авторы считают своим вкладом?",
+          "score_descriptions": {
+            "0": "Вклад статьи непонятен.",
+            "1": "Вклад описан общими словами.",
+            "2": "Вклады конкретно перечислены и отделены от уже известных работ."
+          }
+        },
+        {
+          "id": "novelty_justification",
+          "name": "Обоснована ли новизна?",
+          "category": "contribution_and_novelty",
+          "question": "Показывают ли авторы, чем их работа отличается от предыдущих?",
+          "score_descriptions": {
+            "0": "Новизна не объяснена.",
+            "1": "Новизна заявлена, но сравнение с prior work слабое.",
+            "2": "Новизна обоснована через конкретные отличия от существующих подходов."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CU02_prior_work_positioning_claims",
+      "module_id": "universal_scientific_quality",
+      "group_name": "Prior work, positioning and claim calibration",
+      "criteria": [
+        "related_work_coverage",
+        "positioning_against_prior_work",
+        "nearest_alternative_comparison",
+        "claim_evidence_alignment"
+      ],
+      "recommended_source_sections": [
+        "related work",
+        "introduction",
+        "experiments",
+        "discussion",
+        "conclusion"
+      ],
+      "why_grouped": "Позиционирование и claim calibration связаны: нужно понять, с чем авторы сравниваются и не завышают ли claims.",
+      "criterion_definitions": [
+        {
+          "id": "related_work_coverage",
+          "name": "Достаточно ли покрыты релевантные работы?",
+          "category": "related_work_and_positioning",
+          "question": "Обсуждают ли авторы основные близкие работы?",
+          "score_descriptions": {
+            "0": "Related work отсутствует или почти не связан с задачей.",
+            "1": "Покрыта часть литературы, но есть заметные пробелы.",
+            "2": "Основные релевантные направления и близкие работы покрыты."
+          }
+        },
+        {
+          "id": "positioning_against_prior_work",
+          "name": "Понятно ли позиционирование относительно prior work?",
+          "category": "related_work_and_positioning",
+          "question": "Ясно ли, статья продолжает, уточняет, расширяет, опровергает или заменяет предыдущие подходы?",
+          "score_descriptions": {
+            "0": "Непонятно, как статья соотносится с предыдущими работами.",
+            "1": "Позиционирование есть, но поверхностное: без точных отличий.",
+            "2": "Ясно объяснено, как работа соотносится с конкретными prior approaches."
+          },
+          "required_comment_pattern": "Статья позиционирует себя как ___ относительно ___, потому что ___."
+        },
+        {
+          "id": "nearest_alternative_comparison",
+          "name": "Есть ли честное сравнение с ближайшими альтернативами?",
+          "category": "related_work_and_positioning",
+          "question": "Сравнивают ли авторы себя с наиболее сильными и релевантными альтернативами?",
+          "score_descriptions": {
+            "0": "Сравнения с альтернативами нет.",
+            "1": "Сравнение есть, но неполное: слабые baselines, не все важные работы или только словесное сравнение.",
+            "2": "Сравнение честное, конкретное и включает сильные релевантные альтернативы."
+          }
+        },
+        {
+          "id": "claim_evidence_alignment",
+          "name": "Соответствуют ли claims доказательствам?",
+          "category": "contribution_and_novelty",
+          "question": "Не сильнее ли выводы авторов, чем их evidence?",
+          "score_descriptions": {
+            "0": "Claims явно сильнее, чем evidence.",
+            "1": "Часть claims поддержана, но есть завышения или неподтверждённые обобщения.",
+            "2": "Основные claims аккуратны и хорошо поддержаны evidence."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CU03_method_argument_verifiability",
+      "module_id": "universal_scientific_quality",
+      "group_name": "Method, argument, assumptions and procedure detail",
+      "criteria": [
+        "method_argument_clarity",
+        "argument_logic",
+        "assumptions_discussion",
+        "procedure_detail",
+        "claims_verifiability"
+      ],
+      "recommended_source_sections": [
+        "method",
+        "approach",
+        "theory",
+        "appendix",
+        "proofs"
+      ],
+      "why_grouped": "Все критерии проверяют внутреннюю понятность и проверяемость метода или аргумента.",
+      "criterion_definitions": [
+        {
+          "id": "method_argument_clarity",
+          "name": "Достаточно ли подробно описан метод, теория или аргумент?",
+          "category": "method_theory_argument",
+          "question": "Может ли читатель понять, что именно сделали авторы?",
+          "score_descriptions": {
+            "0": "Невозможно понять, что именно сделали авторы.",
+            "1": "Общий ход понятен, но не хватает важных деталей.",
+            "2": "Описание достаточно подробное, чтобы проверить логику или воспроизвести процедуру."
+          }
+        },
+        {
+          "id": "argument_logic",
+          "name": "Логична ли структура аргумента?",
+          "category": "method_theory_argument",
+          "question": "Следуют ли выводы из предпосылок, метода и результатов?",
+          "score_descriptions": {
+            "0": "Выводы не следуют из предпосылок, метода или результатов.",
+            "1": "Общая логика есть, но есть заметные разрывы.",
+            "2": "Аргументация последовательная и убедительная."
+          }
+        },
+        {
+          "id": "assumptions_discussion",
+          "name": "Названы ли ключевые assumptions?",
+          "category": "method_theory_argument",
+          "question": "Явно ли авторы называют предположения, на которых держится работа?",
+          "score_descriptions": {
+            "0": "Предположения не обсуждаются.",
+            "1": "Часть assumptions подразумевается или упоминается неявно.",
+            "2": "Ключевые assumptions явно названы и обсуждены."
+          }
+        },
+        {
+          "id": "procedure_detail",
+          "name": "Описана ли процедура достаточно подробно?",
+          "category": "reproducibility_and_verifiability",
+          "question": "Достаточно ли деталей для независимой проверки или воспроизведения?",
+          "score_descriptions": {
+            "0": "Процедура не описана или непонятна.",
+            "1": "Процедура понятна только в общих чертах.",
+            "2": "Процедура описана достаточно подробно для независимой проверки или воспроизведения."
+          }
+        },
+        {
+          "id": "claims_verifiability",
+          "name": "Можно ли проверить основные claims?",
+          "category": "reproducibility_and_verifiability",
+          "question": "Может ли независимый читатель проверить главные утверждения?",
+          "score_descriptions": {
+            "0": "Claims практически непроверяемы.",
+            "1": "Часть claims проверяема, но есть барьеры.",
+            "2": "Основные claims проверяемы независимым читателем."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CU04_evidence_robustness_interpretation",
+      "module_id": "universal_scientific_quality",
+      "group_name": "Evidence, robustness, alternatives and interpretation",
+      "criteria": [
+        "evidence_relevance",
+        "evidence_strength",
+        "alternative_explanations_or_baselines",
+        "robustness_sensitivity_ablation",
+        "result_interpretation_mechanism",
+        "alternative_explanations_discussion"
+      ],
+      "recommended_source_sections": [
+        "experiments",
+        "results",
+        "analysis",
+        "discussion",
+        "ablation"
+      ],
+      "why_grouped": "Критерии оценивают, насколько результаты поддерживают claims, устойчивы ли они и объясняют ли авторы механизм.",
+      "criterion_definitions": [
+        {
+          "id": "evidence_relevance",
+          "name": "Подходит ли evidence под главный research question?",
+          "category": "evidence_and_evaluation",
+          "question": "Доказательства действительно проверяют главный вопрос статьи?",
+          "score_descriptions": {
+            "0": "Evidence почти не проверяет главный вопрос статьи.",
+            "1": "Evidence частично связано с вопросом, но покрывает не все claims.",
+            "2": "Evidence напрямую проверяет основные claims статьи."
+          }
+        },
+        {
+          "id": "evidence_strength",
+          "name": "Достаточно ли сильна evaluation?",
+          "category": "evidence_and_evaluation",
+          "question": "Хватает ли экспериментов, анализа, доказательств или кейсов?",
+          "score_descriptions": {
+            "0": "Evidence почти нет или оно очень слабое.",
+            "1": "Evidence есть, но неполное.",
+            "2": "Evidence достаточно сильное для заявленных claims."
+          }
+        },
+        {
+          "id": "alternative_explanations_or_baselines",
+          "name": "Есть ли сравнение с альтернативными объяснениями, baselines или counterexamples?",
+          "category": "evidence_and_evaluation",
+          "question": "Показывают ли авторы, что их объяснение или метод лучше разумных альтернатив?",
+          "score_descriptions": {
+            "0": "Альтернативы не рассматриваются.",
+            "1": "Альтернативы упомянуты, но проверены слабо.",
+            "2": "Авторы убедительно сравнивают свой подход или объяснение с разумными альтернативами."
+          }
+        },
+        {
+          "id": "robustness_sensitivity_ablation",
+          "name": "Есть ли robustness, sensitivity или ablation analysis?",
+          "category": "evidence_and_evaluation",
+          "question": "Проверяется ли устойчивость выводов?",
+          "score_descriptions": {
+            "0": "Устойчивость выводов не проверяется.",
+            "1": "Есть минимальная или неполная проверка.",
+            "2": "Robustness/sensitivity хорошо проверены."
+          }
+        },
+        {
+          "id": "result_interpretation_mechanism",
+          "name": "Объясняют ли авторы, почему результат получился?",
+          "category": "interpretation_and_discussion",
+          "question": "Есть ли механизм, интерпретация или причинное объяснение результата?",
+          "score_descriptions": {
+            "0": "Авторы только сообщают результат, без объяснения механизма.",
+            "1": "Объяснение есть, но поверхностное или слабо подтверждённое.",
+            "2": "Есть конкретный механизм/интерпретация, поддержанная evidence, ablation, анализом или логикой."
+          },
+          "required_fields": [
+            "mechanism",
+            "evidence_for_mechanism"
+          ]
+        },
+        {
+          "id": "alternative_explanations_discussion",
+          "name": "Рассматривают ли авторы альтернативные объяснения?",
+          "category": "interpretation_and_discussion",
+          "question": "Не handwave ли авторы возможные альтернативные причины результата?",
+          "score_descriptions": {
+            "0": "Альтернативные объяснения не обсуждаются.",
+            "1": "Альтернативы упомянуты, но фактически не исключены.",
+            "2": "Альтернативные объяснения рассмотрены и частично проверены или аргументированно исключены."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CU05_limitations_anomalies_future_work",
+      "module_id": "universal_scientific_quality",
+      "group_name": "Anomalies, limitations and future work",
+      "criteria": [
+        "anomaly_explanation",
+        "limitations_presence",
+        "limitations_what_mechanism_scope",
+        "limitations_cover_main_weaknesses",
+        "future_work_from_limitations",
+        "future_work_specificity"
+      ],
+      "recommended_source_sections": [
+        "discussion",
+        "limitations",
+        "future work",
+        "conclusion"
+      ],
+      "why_grouped": "Аномалии, limitations и future work лучше оценивать вместе: future work должен вытекать из реальных ограничений.",
+      "criterion_definitions": [
+        {
+          "id": "anomaly_explanation",
+          "name": "Объяснены ли аномалии и неожиданные результаты?",
+          "category": "interpretation_and_discussion",
+          "question": "Если есть неожиданные результаты, объясняют ли авторы их?",
+          "score_descriptions": {
+            "N/A": "Аномалий или неожиданных результатов нет.",
+            "0": "Аномалии есть, но не объяснены.",
+            "1": "Объяснение есть, но оно speculative или поверхностное.",
+            "2": "Аномалии объяснены правдоподобно и с опорой на данные или анализ."
+          }
+        },
+        {
+          "id": "limitations_presence",
+          "name": "Названы ли ограничения статьи?",
+          "category": "limitations",
+          "question": "Есть ли limitations и отражают ли они реальные ограничения работы?",
+          "score_descriptions": {
+            "0": "Limitations отсутствуют.",
+            "1": "Ограничения есть, но общие или неполные.",
+            "2": "Ограничения конкретные и честно отражают слабые места статьи."
+          }
+        },
+        {
+          "id": "limitations_what_mechanism_scope",
+          "name": "Есть ли у limitations структура WHAT + MECHANISM + SCOPE?",
+          "category": "limitations",
+          "question": "Объясняет ли каждое важное ограничение, что ограничено, почему и в каком scope?",
+          "score_descriptions": {
+            "0": "Ограничения без структуры, например generic 'more experiments are needed'.",
+            "1": "Есть WHAT, но слабо раскрыты MECHANISM или SCOPE.",
+            "2": "Основные limitations имеют WHAT + MECHANISM + SCOPE."
+          },
+          "required_structure": [
+            "WHAT",
+            "MECHANISM",
+            "SCOPE"
+          ]
+        },
+        {
+          "id": "limitations_cover_main_weaknesses",
+          "name": "Обсуждают ли авторы главные слабые места?",
+          "category": "limitations",
+          "question": "Не подменяют ли авторы главные weaknesses второстепенными?",
+          "score_descriptions": {
+            "0": "Главные слабости проигнорированы.",
+            "1": "Часть слабостей названа, но важные проблемы пропущены.",
+            "2": "Основные слабые места честно обсуждены."
+          }
+        },
+        {
+          "id": "future_work_from_limitations",
+          "name": "Следует ли future work из limitations?",
+          "category": "future_work",
+          "question": "Связан ли future work с конкретными ограничениями?",
+          "score_descriptions": {
+            "0": "Future work отсутствует или не связан с limitations.",
+            "1": "Связь частичная или слишком общая.",
+            "2": "Future work напрямую следует из конкретных limitations."
+          }
+        },
+        {
+          "id": "future_work_specificity",
+          "name": "Достаточно ли конкретен future work?",
+          "category": "future_work",
+          "question": "Содержит ли future work действие, гипотезу, объект проверки и возможные исходы?",
+          "score_descriptions": {
+            "0": "Generic 'more research is needed'.",
+            "1": "Направление есть, но без конкретного действия или гипотезы.",
+            "2": "Future work конкретный: понятно, что именно делать и зачем."
+          },
+          "expected_elements": [
+            "action",
+            "hypothesis",
+            "object_of_test",
+            "possible_outcomes"
+          ]
+        }
+      ]
+    },
+    {
+      "group_id": "CU06_materials_reproducibility_writing",
+      "module_id": "universal_scientific_quality",
+      "group_name": "Materials, reproducibility, writing and consistency",
+      "criteria": [
+        "materials_availability",
+        "reasonable_reproducibility_budget",
+        "writing_structure",
+        "section_consistency",
+        "writing_clarity"
+      ],
+      "recommended_source_sections": [
+        "full paper",
+        "appendix",
+        "artifact availability",
+        "abstract",
+        "conclusion"
+      ],
+      "why_grouped": "Группа объединяет practical verifiability и ясность подачи. Scores всё равно остаются отдельными.",
+      "criterion_definitions": [
+        {
+          "id": "materials_availability",
+          "name": "Доступны ли данные, материалы или источники?",
+          "category": "reproducibility_and_verifiability",
+          "question": "Есть ли доступ к материалам, на которых основана работа?",
+          "score_descriptions": {
+            "0": "Материалы не доступны и плохо описаны.",
+            "1": "Материалы частично описаны или частично доступны.",
+            "2": "Материалы доступны или достаточно подробно описаны для проверки."
+          }
+        },
+        {
+          "id": "reasonable_reproducibility_budget",
+          "name": "Можно ли воспроизвести результат за разумное время и бюджет?",
+          "category": "reproducibility_and_verifiability",
+          "question": "Практически воспроизводима ли работа?",
+          "score_descriptions": {
+            "0": "Практически невозможно из-за закрытых данных, отсутствия кода, огромных ресурсов или скрытых деталей.",
+            "1": "Возможно частично, но есть серьёзные барьеры.",
+            "2": "Воспроизводимо с разумными ресурсами или ясно объяснено, что именно требуется."
+          }
+        },
+        {
+          "id": "writing_structure",
+          "name": "Понятна ли структура статьи?",
+          "category": "writing_structure_consistency",
+          "question": "Логично ли организована статья?",
+          "score_descriptions": {
+            "0": "Структура хаотичная и мешает пониманию.",
+            "1": "Структура в целом есть, но некоторые части плохо связаны.",
+            "2": "Структура логичная и хорошо ведёт читателя."
+          }
+        },
+        {
+          "id": "section_consistency",
+          "name": "Согласованы ли abstract, method, results и conclusion?",
+          "category": "writing_structure_consistency",
+          "question": "Нет ли противоречий и завышения выводов между разделами?",
+          "score_descriptions": {
+            "0": "Есть серьёзные противоречия.",
+            "1": "Есть отдельные несостыковки или завышение выводов в abstract/conclusion.",
+            "2": "Основные части статьи согласованы."
+          }
+        },
+        {
+          "id": "writing_clarity",
+          "name": "Достаточно ли ясно написана статья?",
+          "category": "writing_structure_consistency",
+          "question": "Не мешает ли стиль текста понять и проверить claims?",
+          "score_descriptions": {
+            "0": "Текст трудно понять.",
+            "1": "В целом понятно, но есть перегруженные или неясные части.",
+            "2": "Текст ясный, точный и не мешает проверке claims."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CE01_data_integrity",
+      "module_id": "empirical_experimental_quality",
+      "group_name": "Empirical data identity, processing and leakage",
+      "criteria": [
+        "data_name_version_link",
+        "data_composition_exact_numbers",
+        "data_processing_parameters",
+        "leakage_circularity_risk",
+        "public_data_availability"
+      ],
+      "recommended_source_sections": [
+        "data",
+        "dataset",
+        "experimental setup",
+        "appendix"
+      ],
+      "why_grouped": "Все критерии относятся к данным: что это за данные, как они обработаны, доступны ли они и нет ли leakage.",
+      "criterion_definitions": [
+        {
+          "id": "data_name_version_link",
+          "name": "Указаны ли данные с названием, версией и ссылкой?",
+          "category": "data_source_specification",
+          "question": "Можно ли точно идентифицировать данные или источник?",
+          "score_descriptions": {
+            "0": "Данные не названы или источник неясен.",
+            "1": "Данные названы, но нет версии, ссылки или точного источника.",
+            "2": "Есть название, версия/дата/источник и ссылка или способ доступа."
+          }
+        },
+        {
+          "id": "data_composition_exact_numbers",
+          "name": "Описан ли состав данных с точными числами?",
+          "category": "data_source_specification",
+          "question": "Указаны ли размеры выборок, групп, split-ов или включённых источников?",
+          "score_descriptions": {
+            "0": "Числа не указаны.",
+            "1": "Указаны частично: только общий размер или только пропорции.",
+            "2": "Указаны точные числа по ключевым частям."
+          }
+        },
+        {
+          "id": "data_processing_parameters",
+          "name": "Описана ли обработка данных с параметрами?",
+          "category": "data_source_specification",
+          "question": "Описаны ли preprocessing, filtering, cleaning, augmentation и их параметры?",
+          "score_descriptions": {
+            "0": "Preprocessing/filtering/cleaning не описаны.",
+            "1": "Описаны общие шаги, но без параметров или критериев.",
+            "2": "Обработка описана с параметрами, правилами фильтрации и важными деталями."
+          }
+        },
+        {
+          "id": "leakage_circularity_risk",
+          "name": "Есть ли риск leakage, circularity или repeated touching of test set?",
+          "category": "data_source_specification",
+          "question": "Корректно ли отделены training/tuning/exploratory steps от финальной оценки?",
+          "score_descriptions": {
+            "0": "Есть явный или сильный риск leakage/circularity.",
+            "1": "Риск неясен: информации недостаточно.",
+            "2": "Leakage/circularity маловероятны, процедура оценки разделена корректно."
+          },
+          "score_semantics": "inverted_risk_scale"
+        },
+        {
+          "id": "public_data_availability",
+          "name": "Доступны ли данные публично?",
+          "category": "data_source_specification",
+          "question": "Можно ли получить данные или их воспроизводимый аналог?",
+          "score_descriptions": {
+            "0": "Данные закрыты и нет альтернативного способа проверки.",
+            "1": "Данные частично доступны или доступны по запросу.",
+            "2": "Данные публичны, либо есть достаточный synthetic/example dataset для воспроизведения."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CE02_setup_reproducibility",
+      "module_id": "empirical_experimental_quality",
+      "group_name": "Empirical setup, parameters, randomness, environment and code",
+      "criteria": [
+        "exact_system_model_method",
+        "result_affecting_parameters",
+        "parameter_selection_process",
+        "randomness_and_instability",
+        "execution_environment",
+        "code_and_run_instructions"
+      ],
+      "recommended_source_sections": [
+        "method",
+        "experimental setup",
+        "implementation details",
+        "appendix",
+        "code availability"
+      ],
+      "why_grouped": "Критерии отвечают за воспроизводимость setup-а и запуска.",
+      "criterion_definitions": [
+        {
+          "id": "exact_system_model_method",
+          "name": "Указана ли точная система, модель, метод или инструмент?",
+          "category": "experimental_setup",
+          "question": "Можно ли точно понять, какая система или метод использовались?",
+          "score_descriptions": {
+            "0": "Описание слишком общее: например 'BERT', 'LLM', 'standard method'.",
+            "1": "Указана семья метода, но не точная версия, checkpoint или конфигурация.",
+            "2": "Указана точная архитектура, checkpoint, версия инструмента или спецификация метода."
+          }
+        },
+        {
+          "id": "result_affecting_parameters",
+          "name": "Перечислены ли параметры, влияющие на результат?",
+          "category": "experimental_setup",
+          "question": "Достаточно ли параметров для воспроизведения результата?",
+          "score_descriptions": {
+            "0": "Параметры почти не указаны.",
+            "1": "Указана часть параметров, но есть важные пропуски.",
+            "2": "Перечислены ключевые параметры для данного домена."
+          }
+        },
+        {
+          "id": "parameter_selection_process",
+          "name": "Описан ли процесс выбора параметров или конфигураций?",
+          "category": "experimental_setup",
+          "question": "Понятно ли, как выбирались параметры и по какому критерию?",
+          "score_descriptions": {
+            "0": "Не описано, как выбраны параметры.",
+            "1": "Сказано, что параметры tuned/selected, но без диапазонов, бюджета или критерия выбора.",
+            "2": "Описаны метод поиска, диапазоны, число trials/configs, критерий выбора и validation protocol."
+          }
+        },
+        {
+          "id": "randomness_and_instability",
+          "name": "Описаны ли источники случайности и нестабильности?",
+          "category": "experimental_setup",
+          "question": "Указаны ли seeds, повторы и важные источники nondeterminism?",
+          "score_descriptions": {
+            "0": "Randomness не обсуждается.",
+            "1": "Random seed или повторы упомянуты, но nondeterminism/variance описаны неполно.",
+            "2": "Указаны seeds, число запусков и важные источники nondeterminism."
+          }
+        },
+        {
+          "id": "execution_environment",
+          "name": "Указана ли среда выполнения?",
+          "category": "experimental_setup",
+          "question": "Указаны ли hardware, software versions и runtime settings?",
+          "score_descriptions": {
+            "0": "Среда не указана.",
+            "1": "Указана частично: например только GPU или только библиотека.",
+            "2": "Указаны hardware, ключевые версии библиотек, runtime и важные настройки."
+          }
+        },
+        {
+          "id": "code_and_run_instructions",
+          "name": "Открыт ли код с рабочей инструкцией запуска?",
+          "category": "experimental_setup",
+          "question": "Можно ли запустить код по инструкции?",
+          "score_descriptions": {
+            "0": "Кода нет.",
+            "1": "Код есть, но инструкция неполная или запуск неочевиден.",
+            "2": "Код открыт, есть зависимости, команды запуска и инструкция воспроизведения."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CE03_statistics_reliability",
+      "module_id": "empirical_experimental_quality",
+      "group_name": "Empirical metrics, uncertainty, tests and effect size",
+      "criteria": [
+        "metric_formula_or_implementation",
+        "multiple_runs_variance_ci",
+        "statistical_test",
+        "effect_size",
+        "test_sample_size_justification",
+        "multiple_comparisons_control"
+      ],
+      "recommended_source_sections": [
+        "metrics",
+        "results",
+        "statistics",
+        "appendix"
+      ],
+      "why_grouped": "Группа оценивает статистическую надёжность и интерпретируемость результатов.",
+      "criterion_definitions": [
+        {
+          "id": "metric_formula_or_implementation",
+          "name": "Указана ли точная формула или реализация метрики?",
+          "category": "metrics_and_statistical_reliability",
+          "question": "Ясно ли, как exactly считается метрика?",
+          "score_descriptions": {
+            "0": "Метрика названа, но operationalization неясна.",
+            "1": "Метрика описана частично, но есть неоднозначность реализации.",
+            "2": "Указана формула, библиотека, параметры или точная реализация."
+          }
+        },
+        {
+          "id": "multiple_runs_variance_ci",
+          "name": "Сколько запусков? Есть ли mean ± std или CI?",
+          "category": "metrics_and_statistical_reliability",
+          "question": "Оценена ли вариативность результата?",
+          "score_descriptions": {
+            "0": "Один запуск или неизвестное число запусков, variance не указана.",
+            "1": "Несколько запусков есть, но reporting неполный.",
+            "2": "Указаны multiple runs и mean ± std / confidence interval."
+          }
+        },
+        {
+          "id": "statistical_test",
+          "name": "Есть ли statistical test при сравнении моделей или условий?",
+          "category": "metrics_and_statistical_reliability",
+          "question": "Проверена ли статистическая значимость различий?",
+          "score_descriptions": {
+            "0": "Сравнения есть, statistical test отсутствует.",
+            "1": "Test есть, но выбор или применение слабо обоснованы.",
+            "2": "Statistical test подходит к данным и ясно описан."
+          }
+        },
+        {
+          "id": "effect_size",
+          "name": "Указан ли размер эффекта?",
+          "category": "metrics_and_statistical_reliability",
+          "question": "Показана ли практическая величина эффекта, а не только relative gain или p-value?",
+          "score_descriptions": {
+            "0": "Только relative improvement или p-value, без абсолютного эффекта.",
+            "1": "Эффект можно восстановить, но он плохо выделен.",
+            "2": "Ясно указано, насколько метод лучше в абсолютных числах и насколько это practically meaningful."
+          }
+        },
+        {
+          "id": "test_sample_size_justification",
+          "name": "Обоснован ли размер тестовой выборки?",
+          "category": "metrics_and_statistical_reliability",
+          "question": "Достаточен ли test sample size для заявленных claims?",
+          "score_descriptions": {
+            "0": "Test sample size не указан или не обоснован.",
+            "1": "Размер указан, но обоснование слабое.",
+            "2": "Размер обоснован power analysis, стандартом benchmark-а или убедительным аргументом."
+          }
+        },
+        {
+          "id": "multiple_comparisons_control",
+          "name": "Сделаны ли поправки при множественных сравнениях?",
+          "category": "metrics_and_statistical_reliability",
+          "question": "Учтены ли множественные сравнения или researcher degrees of freedom?",
+          "score_descriptions": {
+            "N/A": "Множественных сравнений нет.",
+            "0": "Много сравнений, поправок/контроля нет.",
+            "1": "Проблема частично учтена или только обсуждена.",
+            "2": "Применены корректные поправки или есть убедительное обоснование выбранного анализа."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CE04_artifacts_confirmatory_llm_prompts",
+      "module_id": "empirical_experimental_quality",
+      "group_name": "Artifacts, reproducibility budget, confirmatory status and LLM prompts",
+      "criteria": [
+        "reproducible_with_reasonable_budget",
+        "key_artifacts_published",
+        "exploratory_confirmatory_split",
+        "llm_prompts_templates_policies_verbatim"
+      ],
+      "recommended_source_sections": [
+        "artifact availability",
+        "limitations",
+        "appendix",
+        "prompts",
+        "reproducibility statement"
+      ],
+      "why_grouped": "Критерии относятся к внешней проверке: артефакты, бюджет воспроизведения, статус claims и prompts для LLM papers.",
+      "criterion_definitions": [
+        {
+          "id": "reproducible_with_reasonable_budget",
+          "name": "Можно ли воспроизвести эксперимент за разумное время и бюджет?",
+          "category": "reproducibility_and_artifacts",
+          "question": "Реалистично ли воспроизвести основные результаты?",
+          "score_descriptions": {
+            "0": "Нет: закрытые данные, скрытый код, недоступные ресурсы или слишком дорогой setup.",
+            "1": "Частично: можно воспроизвести часть экспериментов, но есть серьёзные барьеры.",
+            "2": "Да: основные результаты воспроизводимы с разумными ресурсами."
+          }
+        },
+        {
+          "id": "key_artifacts_published",
+          "name": "Опубликованы ли ключевые артефакты?",
+          "category": "reproducibility_and_artifacts",
+          "question": "Опубликованы ли checkpoints, configs, prompts, logs, protocols или другие ключевые артефакты?",
+          "score_descriptions": {
+            "0": "Артефакты не опубликованы.",
+            "1": "Опубликована часть артефактов.",
+            "2": "Опубликованы ключевые артефакты, необходимые для проверки claims."
+          }
+        },
+        {
+          "id": "exploratory_confirmatory_split",
+          "name": "Есть ли preregistration или разделение exploratory / confirmatory?",
+          "category": "reproducibility_and_artifacts",
+          "question": "Отделены ли exploratory findings от confirmatory claims?",
+          "score_descriptions": {
+            "N/A": "Неприменимо.",
+            "0": "Разделения нет, хотя оно важно для claims.",
+            "1": "Разделение частично обозначено.",
+            "2": "Exploratory и confirmatory части явно разделены или есть preregistration/protocol."
+          }
+        },
+        {
+          "id": "llm_prompts_templates_policies_verbatim",
+          "name": "Для LLM/system papers: опубликованы ли prompts/templates/policies дословно?",
+          "category": "reproducibility_and_artifacts",
+          "question": "Можно ли восстановить LLM interaction setup?",
+          "score_descriptions": {
+            "N/A": "Статья не использует prompts или LLM interaction.",
+            "0": "Prompts не опубликованы.",
+            "1": "Prompts описаны частично или пересказаны.",
+            "2": "Prompts/templates/policies/decoding settings опубликованы дословно."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CM01_ml_data_integrity",
+      "module_id": "ml_llm_reproducibility",
+      "group_name": "ML data identity, split, preprocessing, leakage and availability",
+      "criteria": [
+        "ml_dataset_name_version_link",
+        "ml_train_val_test_exact_split",
+        "ml_preprocessing_augmentation_parameters",
+        "ml_test_leakage_risk",
+        "ml_public_data_availability"
+      ],
+      "recommended_source_sections": [
+        "dataset",
+        "data",
+        "experimental setup",
+        "appendix"
+      ],
+      "why_grouped": "Это один локальный data-quality вызов: данные, split, preprocessing, leakage и доступность.",
+      "criterion_definitions": [
+        {
+          "id": "ml_dataset_name_version_link",
+          "name": "Указан ли датасет с названием, версией и ссылкой?",
+          "category": "dataset",
+          "question": "Можно ли точно идентифицировать используемый датасет?",
+          "score_descriptions": {
+            "0": "Датасет не указан или невозможно понять источник данных.",
+            "1": "Датасет назван, но нет версии, ссылки или точной спецификации.",
+            "2": "Есть название, версия/дата, ссылка или clear access path."
+          }
+        },
+        {
+          "id": "ml_train_val_test_exact_split",
+          "name": "Описано ли разбиение train/val/test с точными числами?",
+          "category": "dataset",
+          "question": "Можно ли воспроизвести split?",
+          "score_descriptions": {
+            "0": "Split не описан.",
+            "1": "Split описан частично: например только проценты без чисел.",
+            "2": "Указаны точные числа или полностью воспроизводимое правило split-а."
+          }
+        },
+        {
+          "id": "ml_preprocessing_augmentation_parameters",
+          "name": "Описаны ли preprocessing и augmentation с параметрами?",
+          "category": "dataset",
+          "question": "Достаточно ли деталей о подготовке данных?",
+          "score_descriptions": {
+            "0": "Preprocessing/augmentation не описаны.",
+            "1": "Описаны общие шаги, но нет параметров.",
+            "2": "Описаны шаги, параметры, фильтры, augmentation settings."
+          }
+        },
+        {
+          "id": "ml_test_leakage_risk",
+          "name": "Есть ли подозрение на test leakage?",
+          "category": "dataset",
+          "question": "Есть ли признаки contamination, leakage или repeated tuning on test set?",
+          "score_descriptions": {
+            "0": "Есть явный или сильный риск test leakage.",
+            "1": "Невозможно понять, был ли leakage.",
+            "2": "Процедура явно защищает от leakage."
+          },
+          "score_semantics": "inverted_risk_scale"
+        },
+        {
+          "id": "ml_public_data_availability",
+          "name": "Доступны ли данные публично?",
+          "category": "dataset",
+          "question": "Можно ли получить данные для воспроизведения?",
+          "score_descriptions": {
+            "0": "Данные недоступны.",
+            "1": "Данные частично доступны или доступны по запросу.",
+            "2": "Данные публичны или есть воспроизводимый аналог."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CM02_ml_model_setup_reproducibility",
+      "module_id": "ml_llm_reproducibility",
+      "group_name": "ML model, hyperparameters, search, seed, environment and code",
+      "criteria": [
+        "ml_exact_architecture_or_checkpoint",
+        "ml_hyperparameters_complete",
+        "ml_hyperparameter_search",
+        "ml_random_seed_nondeterminism",
+        "ml_compute_environment",
+        "ml_code_run_instructions"
+      ],
+      "recommended_source_sections": [
+        "model",
+        "method",
+        "experimental setup",
+        "implementation details",
+        "appendix",
+        "repository"
+      ],
+      "why_grouped": "Критерии отвечают за воспроизводимость модели и training/evaluation setup-а.",
+      "criterion_definitions": [
+        {
+          "id": "ml_exact_architecture_or_checkpoint",
+          "name": "Указана ли архитектура или точный checkpoint?",
+          "category": "model_and_setup",
+          "question": "Можно ли точно определить модель?",
+          "score_descriptions": {
+            "0": "Указано только общее семейство, например 'BERT' или 'LLM'.",
+            "1": "Архитектура понятна, но checkpoint/version не указаны.",
+            "2": "Указан точный checkpoint, архитектура, версия модели или commit."
+          }
+        },
+        {
+          "id": "ml_hyperparameters_complete",
+          "name": "Перечислены ли все ключевые гиперпараметры?",
+          "category": "model_and_setup",
+          "question": "Достаточно ли гиперпараметров для воспроизведения?",
+          "score_descriptions": {
+            "0": "Гиперпараметры почти не указаны.",
+            "1": "Указана часть: например lr и batch size, но не optimizer/epochs/weight decay.",
+            "2": "Указаны все ключевые гиперпараметры для воспроизведения."
+          }
+        },
+        {
+          "id": "ml_hyperparameter_search",
+          "name": "Описан ли поиск гиперпараметров?",
+          "category": "model_and_setup",
+          "question": "Понятно ли, как выбирались лучшие параметры?",
+          "score_descriptions": {
+            "0": "Поиск не описан.",
+            "1": "Указано, что tuning был, но без диапазонов/числа trials/критерия.",
+            "2": "Описаны strategy, ranges, budget, validation metric и selection rule."
+          }
+        },
+        {
+          "id": "ml_random_seed_nondeterminism",
+          "name": "Зафиксированы ли random seed и nondeterminism?",
+          "category": "model_and_setup",
+          "question": "Описаны ли seeds, повторы и источники nondeterminism?",
+          "score_descriptions": {
+            "0": "Seed и nondeterminism не обсуждаются.",
+            "1": "Seed указан, но нет обсуждения CUDA/nondeterminism/variance.",
+            "2": "Seed, повторы и nondeterminism описаны достаточно."
+          }
+        },
+        {
+          "id": "ml_compute_environment",
+          "name": "Указана ли compute environment?",
+          "category": "model_and_setup",
+          "question": "Указаны ли GPU/CPU, Python, библиотеки и версии?",
+          "score_descriptions": {
+            "0": "Compute environment отсутствует.",
+            "1": "Указана частично.",
+            "2": "Указаны GPU/CPU, память при необходимости, Python, библиотеки и версии."
+          }
+        },
+        {
+          "id": "ml_code_run_instructions",
+          "name": "Открыт ли код с рабочей инструкцией запуска?",
+          "category": "model_and_setup",
+          "question": "Можно ли воспроизвести запуск из README/scripts?",
+          "score_descriptions": {
+            "0": "Кода нет.",
+            "1": "Код есть, но запуск не полностью описан.",
+            "2": "Есть код, зависимости, команды запуска и README/reproduction script."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CM03_ml_statistical_reliability",
+      "module_id": "ml_llm_reproducibility",
+      "group_name": "ML metric implementation, runs, tests, effect size and comparison control",
+      "criteria": [
+        "ml_metric_formula_implementation",
+        "ml_multiple_runs_std_ci",
+        "ml_statistical_test",
+        "ml_effect_size",
+        "ml_test_set_size_justification",
+        "ml_multiple_comparison_corrections"
+      ],
+      "recommended_source_sections": [
+        "metrics",
+        "results",
+        "tables",
+        "appendix",
+        "statistical analysis"
+      ],
+      "why_grouped": "Группа оценивает статистическую сторону ML-результатов.",
+      "criterion_definitions": [
+        {
+          "id": "ml_metric_formula_implementation",
+          "name": "Указана ли точная формула или реализация метрики?",
+          "category": "metrics_and_statistics",
+          "question": "Понятно ли, как именно считалась метрика?",
+          "score_descriptions": {
+            "0": "Метрика только названа.",
+            "1": "Метрика частично описана, но реализация неоднозначна.",
+            "2": "Указана формула или конкретная реализация: например sklearn/torchmetrics/custom code."
+          }
+        },
+        {
+          "id": "ml_multiple_runs_std_ci",
+          "name": "Сколько запусков сделано? Есть ли mean ± std или 95% CI?",
+          "category": "metrics_and_statistics",
+          "question": "Оценена ли variability результатов?",
+          "score_descriptions": {
+            "0": "Один запуск или неизвестно.",
+            "1": "Несколько запусков есть, но reporting неполный.",
+            "2": "Есть число запусков и mean ± std / 95% CI."
+          }
+        },
+        {
+          "id": "ml_statistical_test",
+          "name": "Есть ли statistical test при сравнении моделей?",
+          "category": "metrics_and_statistics",
+          "question": "Проверена ли значимость различий между моделями?",
+          "score_descriptions": {
+            "0": "Test отсутствует, хотя сравнения есть.",
+            "1": "Test есть, но выбран или описан слабо.",
+            "2": "Test корректный: например McNemar, permutation test, bootstrap, paired test."
+          }
+        },
+        {
+          "id": "ml_effect_size",
+          "name": "Указан ли размер эффекта?",
+          "category": "metrics_and_statistics",
+          "question": "Показана ли практическая значимость улучшения?",
+          "score_descriptions": {
+            "0": "Нет абсолютного размера эффекта.",
+            "1": "Эффект можно восстановить из таблиц, но он не обсуждён.",
+            "2": "Абсолютное улучшение и practical significance явно обсуждены."
+          }
+        },
+        {
+          "id": "ml_test_set_size_justification",
+          "name": "Обоснован ли размер test set?",
+          "category": "metrics_and_statistics",
+          "question": "Понятно ли, почему test set достаточен?",
+          "score_descriptions": {
+            "0": "Размер test set не указан или не обоснован.",
+            "1": "Размер указан, но без аргумента.",
+            "2": "Размер обоснован power analysis, benchmark standard или статистическим аргументом."
+          }
+        },
+        {
+          "id": "ml_multiple_comparison_corrections",
+          "name": "Сделаны ли поправки на множественные сравнения?",
+          "category": "metrics_and_statistics",
+          "question": "Учтены ли multiple datasets/baselines/metrics?",
+          "score_descriptions": {
+            "N/A": "Нет множественных сравнений.",
+            "0": "Много datasets/baselines/metrics, поправок нет.",
+            "1": "Проблема упомянута, но решена частично.",
+            "2": "Поправки или контроль multiple comparisons применены корректно."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CM04_ml_artifacts_budget_confirmatory",
+      "module_id": "ml_llm_reproducibility",
+      "group_name": "ML artifacts, reproducibility budget and exploratory/confirmatory split",
+      "criteria": [
+        "ml_reproducible_budget",
+        "ml_published_checkpoints_artifacts",
+        "ml_exploratory_confirmatory_split"
+      ],
+      "recommended_source_sections": [
+        "artifact availability",
+        "code",
+        "appendix",
+        "limitations",
+        "reproducibility statement"
+      ],
+      "why_grouped": "Группа отвечает за practical reproducibility и доступность артефактов.",
+      "criterion_definitions": [
+        {
+          "id": "ml_reproducible_budget",
+          "name": "Можно ли воспроизвести за разумное время и бюджет?",
+          "category": "reproducibility_and_artifacts",
+          "question": "Можно ли практически повторить основные эксперименты?",
+          "score_descriptions": {
+            "0": "Нет: закрытые данные, скрытый код, недоступные ресурсы или слишком дорогой setup.",
+            "1": "Частично: можно воспроизвести часть экспериментов, но есть серьёзные барьеры.",
+            "2": "Да: основные результаты воспроизводимы с разумными ресурсами."
+          }
+        },
+        {
+          "id": "ml_published_checkpoints_artifacts",
+          "name": "Опубликованы ли checkpoints или ключевые артефакты?",
+          "category": "reproducibility_and_artifacts",
+          "question": "Доступны ли model checkpoints, configs, logs, processed data или другие артефакты?",
+          "score_descriptions": {
+            "0": "Ключевые артефакты не опубликованы.",
+            "1": "Опубликована часть артефактов.",
+            "2": "Опубликованы ключевые артефакты, например checkpoints/configs/logs/processed data."
+          }
+        },
+        {
+          "id": "ml_exploratory_confirmatory_split",
+          "name": "Есть ли preregistration или разделение exploratory/confirmatory?",
+          "category": "reproducibility_and_artifacts",
+          "question": "Отделены ли exploratory experiments от confirmatory claims?",
+          "score_descriptions": {
+            "N/A": "Неприменимо.",
+            "0": "Разделения нет, хотя оно важно для claims.",
+            "1": "Разделение частично обозначено.",
+            "2": "Exploratory и confirmatory части явно разделены или есть preregistration/protocol."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "CM05_llm_reproducibility_and_judge_quality",
+      "module_id": "ml_llm_reproducibility",
+      "group_name": "LLM model, decoding, prompts, structured output, stability and judge bias",
+      "criteria": [
+        "llm_exact_model_version",
+        "llm_decoding_parameters",
+        "llm_prompts_verbatim",
+        "llm_structured_output_parsing_validation",
+        "llm_judge_stability",
+        "llm_judge_bias_sensitivity"
+      ],
+      "recommended_source_sections": [
+        "LLM setup",
+        "prompts",
+        "evaluation",
+        "appendix",
+        "reproducibility statement"
+      ],
+      "why_grouped": "Все критерии относятся к воспроизводимости LLM-вызовов и качеству LLM-as-a-judge.",
+      "criterion_definitions": [
+        {
+          "id": "llm_exact_model_version",
+          "name": "Указана ли точная LLM-модель?",
+          "category": "llm_specific_reproducibility",
+          "question": "Можно ли точно определить LLM/provider/version/API snapshot?",
+          "score_descriptions": {
+            "N/A": "Статья не использует LLM.",
+            "0": "Указано только 'GPT-4', 'Claude', 'LLM' без версии.",
+            "1": "Модель названа, но нет версии/date/API details.",
+            "2": "Указана точная модель, версия, provider, дата запуска или API snapshot."
+          }
+        },
+        {
+          "id": "llm_decoding_parameters",
+          "name": "Указаны ли decoding parameters?",
+          "category": "llm_specific_reproducibility",
+          "question": "Указаны ли temperature, top_p, max_tokens, seed и другие параметры генерации?",
+          "score_descriptions": {
+            "N/A": "Статья не использует LLM generation.",
+            "0": "Decoding settings не указаны.",
+            "1": "Указана часть: например temperature, но не top_p/max_tokens/seed.",
+            "2": "Указаны temperature, top_p, max_tokens, seed если доступен, и другие важные параметры."
+          }
+        },
+        {
+          "id": "llm_prompts_verbatim",
+          "name": "Опубликованы ли prompts дословно?",
+          "category": "llm_specific_reproducibility",
+          "question": "Опубликованы ли все ключевые prompts/templates/system instructions?",
+          "score_descriptions": {
+            "N/A": "Статья не использует prompts.",
+            "0": "Prompts отсутствуют.",
+            "1": "Prompts пересказаны или опубликованы частично.",
+            "2": "Все ключевые prompts/templates/system instructions опубликованы дословно."
+          }
+        },
+        {
+          "id": "llm_structured_output_parsing_validation",
+          "name": "Описан ли structured output / parsing / validation?",
+          "category": "llm_specific_reproducibility",
+          "question": "Понятно ли, как ответы LLM превращались в данные?",
+          "score_descriptions": {
+            "N/A": "Статья не использует LLM outputs as data.",
+            "0": "Непонятно, как ответы LLM превращались в данные.",
+            "1": "Формат описан частично.",
+            "2": "Описаны schema, parser, validation, retry/failure handling."
+          }
+        },
+        {
+          "id": "llm_judge_stability",
+          "name": "Проверялась ли стабильность LLM-оценок?",
+          "category": "llm_specific_reproducibility",
+          "question": "Проверены ли inter-run agreement, human agreement, calibration или повторные оценки?",
+          "score_descriptions": {
+            "N/A": "Статья не использует LLM-as-a-judge.",
+            "0": "Стабильность не проверялась.",
+            "1": "Есть минимальная проверка: несколько прогонов или qualitative sanity check.",
+            "2": "Есть inter-run agreement, human agreement, calibration или повторные оценки."
+          }
+        },
+        {
+          "id": "llm_judge_bias_sensitivity",
+          "name": "Проверялась ли bias/fairness/position/order sensitivity judge-а?",
+          "category": "llm_specific_reproducibility",
+          "question": "Проверены ли order effects, position bias, verbosity bias, self-preference или domain bias?",
+          "score_descriptions": {
+            "N/A": "Статья не использует LLM-as-a-judge.",
+            "0": "Не проверялось.",
+            "1": "Проверено частично.",
+            "2": "Проверены order effects, position bias, verbosity bias, self-preference или domain bias."
+          }
+        }
+      ]
+    }
+  ],
+  "recommended_calling_strategy": {
+    "for_any_paper_fast": [
+      "CU01_framing_contribution",
+      "CU02_prior_work_positioning_claims",
+      "CU03_method_argument_verifiability",
+      "CU04_evidence_robustness_interpretation",
+      "CU05_limitations_anomalies_future_work",
+      "CU06_materials_reproducibility_writing"
+    ],
+    "for_non_ml_empirical_paper_add": [
+      "CE01_data_integrity",
+      "CE02_setup_reproducibility",
+      "CE03_statistics_reliability",
+      "CE04_artifacts_confirmatory_llm_prompts"
+    ],
+    "for_ml_or_llm_paper_add": [
+      "CM01_ml_data_integrity",
+      "CM02_ml_model_setup_reproducibility",
+      "CM03_ml_statistical_reliability",
+      "CM04_ml_artifacts_budget_confirmatory",
+      "CM05_llm_reproducibility_and_judge_quality"
+    ],
+    "recommended_for_ml_llm": "Использовать CU01-CU06 + CM01-CM05. Обычно не запускать CE01-CE04 для ML/LLM, потому что они частично дублируются с CM-группами.",
+    "estimated_calls": {
+      "generic_paper": 6,
+      "non_ml_empirical_paper": 10,
+      "ml_llm_paper": 11
+    }
+  }
+}

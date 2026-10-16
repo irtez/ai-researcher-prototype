@@ -1,0 +1,26 @@
+# Authenticated ("team") deploy overlay. Layer ON TOP of the base compose:
+#
+#   docker compose -f docker-compose.yml -f docker-compose.auth.yml --profile ui up -d
+#
+# What it adds:
+#   * HTTP Basic auth at nginx (predefined login/password list in the gitignored
+#     docker/.htpasswd -- generate entries with scripts/make_htpasswd.sh).
+#   * nginx rewrites X-Holo-Client to the authenticated username, turning the
+#     existing per-owner isolation into a real auth boundary (no header forgery)
+#     and feeding the login into Langfuse `user`.
+#   * Pulls the codearkt control API (app:5055, /agents/* -- run start/cancel)
+#     back to 127.0.0.1 so it can't be reached bypassing nginx's auth.
+#
+# For a fully locked-down public host, also layer docker-compose.selectel-public.yml
+# to bind the remaining backend/MCP/langfuse ports to localhost. Basic auth sends
+# credentials on every request, so terminate TLS in front (reverse proxy / tunnel)
+# on any non-loopback exposure.
+services:
+  ui:
+    volumes:
+      - ./docker/nginx-ui-auth.conf:/etc/nginx/conf.d/default.conf:ro
+      - ${HOLO_HTPASSWD_PATH:-./docker/.htpasswd}:/etc/nginx/.htpasswd:ro
+
+  app:
+    ports:
+      - "127.0.0.1:${APP_PORT:-5055}:5055"

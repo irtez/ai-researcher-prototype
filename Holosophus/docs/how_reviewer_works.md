@@ -1,0 +1,5 @@
+# Holosophos
+- Основной ревьюер — `academia_mcp/tools/review.py`: асинхронно вызывает LLM (`llm_acall`) с моделью из `settings.REVIEW_MODEL_NAME` через OpenRouter. В `review_pdf_paper` статья загружается текстом (`parse_pdf_file`) и страницами-изображениями (`parse_pdf_file_to_images`), рисунки кодируются в base64 и передаются в мультимодальном сообщении вместе с жёстко заданным JSON-шаблоном `PROMPT`.
+- `download_pdf_paper` и `review_pdf_paper_by_url` отвечают за загрузку PDF: имя генерируется `_create_pdf_filename`, файл сохраняется в `WORKSPACE_DIR` (см. `get_workspace_dir`). Локальные и временные пути поддерживаются — функция автоматически переключается между готовым файлом и скачиванием по URL.
+- Результат — всегда корректный JSON с полями NeurIPS-формы (summary, оценки по Quality/Clarity/Significance/Originality, вопросы, ограничения, форматные ошибки и т.д.), что облегчает дальнейший автопарсинг.
+- Вспомогательные модули: `academia_mcp/pdf.py` (pypdf + PyMuPDF для извлечения текста и изображений) и `academia_mcp/llm.py` (обёртка над `AsyncOpenAI`). Все сетевые вызовы проходят через openrouter и наследуют его backoff/валидацию.

@@ -1,0 +1,68 @@
+# Model IDs below preserve the installed Claude CLI aliases. Replace model_id
+# with a full provider slug to pin a version. Secrets are read from env only.
+defaults:
+  claude_code: opus
+  codearkt: default-codearkt
+models:
+  opus:
+    label: Claude Opus
+    runtime: claude_code
+    connection: subscription
+    model_id: opus
+    generation:
+      thinking: {type: adaptive}
+      effort: {choices: [low, medium, high, max], default: max}
+  sonnet:
+    label: Claude Sonnet
+    runtime: claude_code
+    connection: subscription
+    model_id: sonnet
+    generation:
+      thinking: {type: adaptive}
+      effort: {choices: [low, medium, high], default: high}
+  haiku:
+    label: Claude Haiku
+    runtime: claude_code
+    connection: subscription
+    model_id: haiku
+    generation:
+      thinking: {type: disabled}
+  deepseek-v4-pro:
+    label: DeepSeek V4 Pro (0813)
+    runtime: claude_code
+    connection: api
+    model_id: deepseek-v4-pro
+    base_url: https://api.deepseek.com/anthropic
+    auth: {type: bearer, token_env: DEEPSEEK_API_KEY}
+    generation:
+      # SDK requires a budget for enabled thinking; DeepSeek ignores the budget
+      # and uses output_config.effort. Supported levels: low/high/max.
+      thinking: {type: enabled, budget_tokens: 4096}
+      effort: {choices: [low, high, max], default: low}
+      max_output_tokens: 16384
+      # Conservative setting for the first small run (API supports up to 1M).
+      context_window: 200000
+  default-codearkt:
+    label: CodeArkt — configured model
+    runtime: codearkt
+    connection: api
+    model_id: deepseek/deepseek-chat-v3.1
+    model_id_env: MODEL_NAME
+    base_url: https://openrouter.ai/api/v1
+    base_url_env: BASE_URL
+    auth: {type: bearer, token_env: OPENROUTER_API_KEY}
+  # Enable after configuring your server and its tool-calling support.
+  laboratory:
+    enabled: false
+    label: Модель лаборатории
+    runtime: claude_code
+    connection: api
+    model_id: my-model
+    base_url: http://localhost:8000
+    auth: {type: bearer, token_env: LAB_MODEL_TOKEN}
+    generation:
+      thinking: {type: disabled}
+      max_output_tokens: 8192
+      context_window: 131072
+      # Add effort only if this model/server supports it:
+      # effort: {choices: [low, medium, high], default: medium}

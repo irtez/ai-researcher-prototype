@@ -1,0 +1,101 @@
+{
+  "description": "Product reviews with ground truth for multi-prompt multi-model A/B testing. 15 reviews: 5 straightforward, 5 nuanced, 5 tricky (sarcasm/ambiguity).",
+  "models": [
+    "deepseek/deepseek-chat-v3-0324",
+    "google/gemini-2.0-flash-001"
+  ],
+  "prompt_a": "Extract sentiment, aspect, and confidence from this review. Reply as JSON with keys: sentiment, aspect, confidence.",
+  "prompt_b": "Analyze this product review. Extract: 1) sentiment (positive/negative based on overall tone), 2) aspect (the main topic: quality, price, shipping, or support), 3) confidence (high if clear, medium if mixed signals, low if ambiguous). Consider sarcasm and implicit meaning. Reply as JSON: {\"sentiment\": \"...\", \"aspect\": \"...\", \"confidence\": \"...\"}",
+  "reviews": [
+    {
+      "id": 1,
+      "category": "straightforward",
+      "text": "Absolutely love this product! The build quality is exceptional and it feels premium in hand.",
+      "ground_truth": {"sentiment": "positive", "aspect": "quality", "confidence": "high"}
+    },
+    {
+      "id": 2,
+      "category": "straightforward",
+      "text": "Way too expensive for what you get. There are much cheaper alternatives that work just as well.",
+      "ground_truth": {"sentiment": "negative", "aspect": "price", "confidence": "high"}
+    },
+    {
+      "id": 3,
+      "category": "straightforward",
+      "text": "Arrived in 2 days with perfect packaging. Very impressed with the delivery experience.",
+      "ground_truth": {"sentiment": "positive", "aspect": "shipping", "confidence": "high"}
+    },
+    {
+      "id": 4,
+      "category": "straightforward",
+      "text": "Customer service was incredibly helpful. They resolved my issue within an hour.",
+      "ground_truth": {"sentiment": "positive", "aspect": "support", "confidence": "high"}
+    },
+    {
+      "id": 5,
+      "category": "straightforward",
+      "text": "Broke after one week of normal use. Terrible build quality, waste of money.",
+      "ground_truth": {"sentiment": "negative", "aspect": "quality", "confidence": "high"}
+    },
+    {
+      "id": 6,
+      "category": "nuanced",
+      "text": "The product itself is great, but at this price point I expected faster shipping. Took 3 weeks.",
+      "ground_truth": {"sentiment": "negative", "aspect": "shipping", "confidence": "medium"}
+    },
+    {
+      "id": 7,
+      "category": "nuanced",
+      "text": "Decent quality for the price range. Not premium but gets the job done. Fair value overall.",
+      "ground_truth": {"sentiment": "positive", "aspect": "price", "confidence": "medium"}
+    },
+    {
+      "id": 8,
+      "category": "nuanced",
+      "text": "Support team was polite but couldn't actually fix my problem. Had to figure it out myself.",
+      "ground_truth": {"sentiment": "negative", "aspect": "support", "confidence": "medium"}
+    },
+    {
+      "id": 9,
+      "category": "nuanced",
+      "text": "Good quality materials but the design could be better. It works well but looks cheap.",
+      "ground_truth": {"sentiment": "positive", "aspect": "quality", "confidence": "medium"}
+    },
+    {
+      "id": 10,
+      "category": "nuanced",
+      "text": "Free shipping was nice but the box arrived damaged. Product inside was fine though.",
+      "ground_truth": {"sentiment": "positive", "aspect": "shipping", "confidence": "medium"}
+    },
+    {
+      "id": 11,
+      "category": "tricky",
+      "text": "Oh sure, spending $200 on something that does what a $20 version does is a GREAT idea.",
+      "ground_truth": {"sentiment": "negative", "aspect": "price", "confidence": "high"}
+    },
+    {
+      "id": 12,
+      "category": "tricky",
+      "text": "I guess if you enjoy waiting 4 weeks for a package, this is the store for you.",
+      "ground_truth": {"sentiment": "negative", "aspect": "shipping", "confidence": "high"}
+    },
+    {
+      "id": 13,
+      "category": "tricky",
+      "text": "The support agent said 'we'll get back to you soon.' That was three months ago.",
+      "ground_truth": {"sentiment": "negative", "aspect": "support", "confidence": "high"}
+    },
+    {
+      "id": 14,
+      "category": "tricky",
+      "text": "It works. I mean, it technically does what it says. I just expected... more?",
+      "ground_truth": {"sentiment": "negative", "aspect": "quality", "confidence": "low"}
+    },
+    {
+      "id": 15,
+      "category": "tricky",
+      "text": "Not the worst thing I've ever bought. Not the best either. It exists.",
+      "ground_truth": {"sentiment": "negative", "aspect": "quality", "confidence": "low"}
+    }
+  ]
+}

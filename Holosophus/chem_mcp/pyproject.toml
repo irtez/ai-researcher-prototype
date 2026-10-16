@@ -1,0 +1,49 @@
+[project]
+name = "chem-tools"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "admet-ai>=2.0.1",
+    "datasets>=4.0.0",
+    "httpx>=0.28.1",
+    "mcp[cli]>=1.26.0",
+    "pandas[excel]>=3.0.1",
+    "pubchempy>=1.0.5",
+    "python-docx>=1.2.0",
+    "pyyaml>=6.0.3",
+    "rdkit>=2025.9.6",
+]
+
+[project.scripts]
+chem-tools-mcp = "mcp_server:main"
+chem-datasets = "prepare_datasets:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = [
+    "adme_metadata",
+    "adme_prediction",
+    "adme_tools",
+    "chemx_integration",
+    "chemx_tools",
+    "dataset_registry",
+    "dataset_store",
+    "dataset_tools",
+    "prepare_datasets",
+    "file_processing",
+    "file_tools",
+    "mcp_server",
+    "molecular_structure_processing",
+    "molecular_structure_tools",
+    "pubchem_integration",
+    "pubchem_tools",
+    "session_paths",
+]
+
+[tool.setuptools.data-files]
+"share/chem-tools" = ["datasets.yaml"]

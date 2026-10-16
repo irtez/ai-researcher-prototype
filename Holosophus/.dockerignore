@@ -1,0 +1,15 @@
+.git
+**/.git
+**/.venv
+**/__pycache__
+**/.pytest_cache
+**/node_modules
+**/dist
+**/.vite
+.tmp
+workdir
+reports
+llm_liars
+paperbanana/.venv
+paperbanana/.git
+paperbanana

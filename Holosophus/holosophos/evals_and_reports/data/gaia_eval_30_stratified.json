@@ -1,0 +1,242 @@
+[
+  {
+    "idx": 9,
+    "question": "Here's a fun riddle that I think you'll enjoy.\n\nYou have been selected to play the final round of the hit new game show \"Pick That Ping-Pong\". In this round, you will be competing for a large cash prize. Your job will be to pick one of several different numbered ping-pong balls, and then the game will commence. The host describes how the game works.\n\nA device consisting of a winding clear ramp and a series of pistons controls the outcome of the game. The ramp feeds balls onto a platform. The platform has room for three ping-pong balls at a time. The three balls on the platform are each aligned with one of three pistons. At each stage of the game, one of the three pistons will randomly fire, ejecting the ball it strikes. If the piston ejects the ball in the first position on the platform the balls in the second and third position on the platform each advance one space, and the next ball on the ramp advances to the third position. If the piston ejects the ball in the second position, the ball in the first position is released and rolls away, the ball in the third position advances two spaces to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform. If the piston ejects the ball in the third position, the ball in the first position is released and rolls away, the ball in the second position advances one space to occupy the first position, and the next two balls on the ramp advance to occupy the second and third positions on the platform.\n\nThe ramp begins with 100 numbered ping-pong balls, arranged in ascending order from 1 to 100. The host activates the machine and the first three balls, numbered 1, 2, and 3, advance to the platform. Before the random firing of the pistons begins, you are asked which of the 100 balls you would like to pick. If your pick is ejected by one of the pistons, you win the grand prize, $10,000.\n\nWhich ball should you choose to maximize your odds of winning the big prize? Please provide your answer as the number of the ball selected.",
+    "answer": "3",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 10,
+    "question": "In July 2, 1959 United States standards for grades of processed fruits, vegetables, and certain other products listed as dehydrated, consider the items in the \"dried and dehydrated section\" specifically marked as dehydrated along with any items in the Frozen/Chilled section that contain the whole name of the item, but not if they're marked Chilled. As of August 2023, what is the percentage (to the nearest percent) of those standards that have been superseded by a new version since the date given in the 1959 standards?",
+    "answer": "86",
+    "level": "3",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 13,
+    "question": "In April of 1977, who was the Prime Minister of the first place mentioned by name in the Book of Esther (in the New International Version)?",
+    "answer": "Morarji Desai",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 15,
+    "question": "Use density measures from the chemistry materials licensed by Marisa Alviar-Agnew & Henry Agnew under the CK-12 license in LibreText's Introductory Chemistry materials as compiled 08/21/2023.\n\nI have a gallon of honey and a gallon of mayonnaise at 25C. I remove one cup of honey at a time from the gallon of honey. How many times will I need to remove a cup to have the honey weigh less than the mayonaise? Assume the containers themselves weigh the same.",
+    "answer": "6",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 16,
+    "question": "What was the volume in m^3 of the fish bag that was calculated in the University of Leicester paper \"Can Hiccup Supply Enough Fish to Maintain a Dragon’s Diet?\"",
+    "answer": "0.1777",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 33,
+    "question": "The photograph in the Whitney Museum of American Art's collection with accession number 2022.128 shows a person holding a book. Which military unit did the author of this book join in 1813? Answer without using articles.",
+    "answer": "Russian-German Legion",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 38,
+    "question": "I went to Virtue restaurant & bar in Chicago for my birthday on March 22, 2021 and the main course I had was delicious!  Unfortunately, when I went back about a month later on April 21, it was no longer on the dinner menu.  Using the Wayback Machine, can you help me figure out which main course was on the dinner menu for Virtue on March 22, 2021 but not April 21, 2021? Answer using the singular form, without articles.",
+    "answer": "shrimp",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 40,
+    "question": "My family reunion is this week, and I was assigned the mashed potatoes to bring. The attendees include my married mother and father, my twin brother and his family, my aunt and her family, my grandma and her brother, her brother's daughter, and his daughter's family. All the adults but me have been married, and no one is divorced or remarried, but my grandpa and my grandma's sister-in-law passed away last year. All living spouses are attending. My brother has two children that are still kids, my aunt has one six-year-old, and my grandma's brother's daughter has three kids under 12. I figure each adult will eat about 1.5 potatoes of mashed potatoes and each kid will eat about 1/2 a potato of mashed potatoes, except my second cousins don't eat carbs. The average potato is about half a pound, and potatoes are sold in 5-pound bags. How many whole bags of potatoes do I need? Just give the number.",
+    "answer": "2",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 43,
+    "question": "Under DDC 633 on Bielefeld University Library's BASE, as of 2020, from what country was the unknown language article with a flag unique from the others?",
+    "answer": "Guatemala",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 44,
+    "question": "In the 2018 VSCode blog post on replit.com, what was the command they clicked on in the last video to remove extra lines?",
+    "answer": "Format Document",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 54,
+    "question": "According to Google Finance, when was the first year the Apple stock went above $50 (without adjusting for stock split)?",
+    "answer": "2018",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 58,
+    "question": "Who nominated the only Featured Article on English Wikipedia about a dinosaur that was promoted in November 2016?",
+    "answer": "FunkMonk",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 59,
+    "question": "What writer is quoted by Merriam-Webster for the Word of the Day from June 27, 2022?",
+    "answer": "Annie Levin",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 67,
+    "question": "On a leap day before the year 2008, a joke was removed from the Wikipedia page for “Dragon”. What was the phrase that was removed? Give the phrase as it appeared on the page, but without punctuation.",
+    "answer": "Here be dragons",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 68,
+    "question": "What is the volume in milliliters of a system comprised of 0.312 kg Freon-12 refrigerant when placed at the bottom of the Marianas Trench and allowed to stabilize at the Trench's peak temperature, rounded to the nearest mL? Provide your answer as just an integer value.",
+    "answer": "55",
+    "level": "3",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 70,
+    "question": "Find the value of x to the nearest tenth: Lx = (d/dx * (A * x-squared)) + 4-thousand'n'ninety-7 minus C\nWhere L is the last two digits of the year of the Venezuelan Declaration of Independence,\nA is the number of colors in the TikTok logo as of July 2023, excluding black and white,\nand C is the height of the average woman in the Philippines according to a July 2023 Business Insider article, rounded to the nearest whole centimeter",
+    "answer": "563.9",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 71,
+    "question": "In the endnote found in the second-to-last paragraph of page 11 of the book with the doi 10.2307/j.ctv9b2xdv, what date in November was the Wikipedia article accessed? Just give the day of the month.",
+    "answer": "4",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 76,
+    "question": "How many edits were made to the Wikipedia page on Antidisestablishmentarianism from its inception until June of 2023?",
+    "answer": "2732",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 91,
+    "question": "According to wikipedia, how many Asian countries still have a monarchy and access to the sea in 2021?",
+    "answer": "12",
+    "level": "3",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 96,
+    "question": "What is the surname of the equine veterinarian mentioned in 1.E Exercises from the chemistry materials licensed by Marisa Alviar-Agnew & Henry Agnew under the CK-12 license in LibreText's Introductory Chemistry materials as compiled 08/21/2023?",
+    "answer": "Louvrier",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 109,
+    "question": "The year is 2022. I am at the National Air and Space Museum east of the Potomac River. I want to go to Fire Station 301 DCA ARFF using the metro. I go in the wrong direction and end up at the station closest to Cleveland Elementary School. How many metro stations am I away from my original destination if I don't change lines? Your answer should be a numerical integer value.",
+    "answer": "8",
+    "level": "3",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 114,
+    "question": "The YouTube channel Game Grumps began a Let’s Play of the game Sonic the Hedgehog (2006) in the year 2012. Thirty seconds into the first episode, a phrase is shown on the screen in white letters on a red background. How many times does the letter \"E\" appear in this phrase?",
+    "answer": "4",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 118,
+    "question": "The longest-lived vertebrate is named after an island.  According to Wikipedia as of January 1, 2021, what is the 2020 estimated population of that island, to the nearest thousand?",
+    "answer": "56000",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 120,
+    "question": "On the DeepFruits fruit detection graph on Connected Papers from 2016, what feature caused the largest bubble to be the size it is?",
+    "answer": "Citations",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 122,
+    "question": "How many more blocks (also denoted as layers) in BERT base encoder than the encoder from the architecture proposed in Attention is All You Need?",
+    "answer": "6",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 129,
+    "question": "According to the USGS, in what year was the American Alligator first found west of Texas (not including Texas)?",
+    "answer": "1954",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 130,
+    "question": "Of the cities within the United States where U.S. presidents were born, which two are the farthest apart from the westernmost to the easternmost going east, giving the city names only? Give them to me in alphabetical order, in a comma-separated list",
+    "answer": "Braintree, Honolulu",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 133,
+    "question": "According to Girls Who Code, how long did it take in years for the percentage of computer scientists that were women to change by 13% from a starting point of 37%?",
+    "answer": "22",
+    "level": "1",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 141,
+    "question": "What is the absolute difference in tens of thousands between the population of chinstrap penguins on the Wikipedia page for penguin species populations as of the end of 2018 and the population recorded in the Nature.com \"global population assessment of the Chinstrap penguin\" article from 2020, assuming two penguins per breeding pair?",
+    "answer": "116",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  },
+  {
+    "idx": 161,
+    "question": "In the film Goldfinger, what color was the object that James Bond concealed himself and his companion Pussy Galore at the end of the film? If there are multiple colors, put them in a comma-separated list in alphabetical order.",
+    "answer": "orange, white",
+    "level": "2",
+    "has_file": false,
+    "file_path": ""
+  }
+]

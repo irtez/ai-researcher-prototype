@@ -1,0 +1,65 @@
+# macOS
+.DS_Store
+
+# Python bytecode/cache
+__pycache__/
+*.py[cod]
+*.class
+.last_ideas_path
+
+# Virtual environments (common names)
+.venv/
+venv/
+env/
+
+# Python tooling
+.python-version
+
+# Distribution / packaging
+*.egg-info/
+*.egg
+
+# dotenv
+.env
+
+# Holosophus integration
+Holosophus/.env
+Holosophus/.venv/
+Holosophus/workdir/
+Holosophus/paper/
+Holosophus/holosophos/evals_and_reports/proposer_eval_results/
+Holosophus/problems/
+!Holosophus/holosophos/
+!Holosophus/README.md
+!Holosophus/sync.sh
+
+# cloned third-party coding agents (analysis only, not committed)
+agents_research/repos/
+
+node_modules/
+dist/
+.vite/
+
+Holosophus/benchmark/data
+
+.specify
+
+trash/
+specs/
+.cursor/
+.vscode/
+.claude/
+superpowers/
+
+# Local credentials and execution state
+.env.*
+!.env.example
+!.env_example
+.console-state/
+.console-smoke/
+console-downloads/
+.pytest_cache/
+.ruff_cache/
+.deploy*/
+*.pem
+*.key

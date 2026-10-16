@@ -1,0 +1,6 @@
+{"query": "Find the paper that indroduces self-reflexive tokens to call rag adaptively", "date": "07-02-2025", "target": ["2310.11511"]}
+{"query": "Which paper presents a method for accelerating the output of large language models using additional decoding heads for parallel prediction of multiple tokens?", "date": "07-02-2025", "target": ["2401.10774"]}
+{"query": "Which paper introduces the method for adaptive rag using uncertainty scores?", "date": "07-02-2025", "target": ["2406.19215", "2501.12835", "2305.06983", "2403.10081"]}
+{"query": "Find the paper for adaptive rag using prober on internal representaion", "date": "07-02-2025", "target": ["2410.13339", "2405.18727"]}
+{"query": "Which paper proposed a decoding strategy for llms by dynamically selecting layers and contrasting their logits?", "date": "07-02-2025", "target": ["2309.03883"]}
+{"query": "How can LLM agents be evaluated and benchmarked for financial tasks? Note that I am referring to agents.", "date": "31-12-2024", "target": ["2409.14913"]}

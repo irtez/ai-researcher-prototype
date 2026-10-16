@@ -1,0 +1,63 @@
+You are given research proposals to evaluate.
+
+{% for proposal in proposals %}
+## Proposal {{loop.index0}}
+{{proposal}}
+
+{% endfor %}
+
+## Evaluation rubric
+
+**Novelty** (1-4):
+1 — Straightforward application of known methods. No new insight.
+2 — Combines existing ideas in a somewhat new way, or applies known methods to a new domain.
+3 — Meaningfully new perspective or method not clearly present in prior work.
+4 — Fundamentally new paradigm or technique that could shift the research direction.
+
+**Clarity** (1-4):
+1 — Vague, contradictory, or missing key details.
+2 — Main idea understandable but important details unclear.
+3 — Well-written with clear problem, method, experiments. Minor gaps.
+4 — Exceptionally clear. Could be submitted as-is.
+
+**Significance** (1-4):
+1 — Trivial or already-solved problem. Minimal impact.
+2 — Real problem but limited to narrow subfield.
+3 — Could meaningfully advance a research area.
+4 — Broad impact across fields or fundamentally change practice.
+
+**Feasibility** (1-4):
+1 — Requires unavailable data/compute/methods. Underspecified.
+2 — Achievable but significant challenges. Some steps unclear.
+3 — Clearly achievable. Experiments well-specified with named datasets/metrics.
+4 — Straightforward. All datasets, baselines, metrics explicitly named.
+
+**Soundness** (1-4):
+1 — Fundamental flaws or unsupported assumptions.
+2 — Reasonable but notable gaps in reasoning or design.
+3 — Solid methodology, well-justified. Minor concerns.
+4 — Rigorous. Design comprehensively addresses hypothesis.
+
+**Overall** (1-5):
+1 — Reject: fundamentally flawed or trivial.
+2 — Weak reject: interesting direction but major issues.
+3 — Borderline: has merit, needs significant revision.
+4 — Accept: clear contribution, well-executed.
+5 — Strong accept: top quality, ready for publication.
+
+For each proposal provide per-criterion reasoning BEFORE scores, >=2 strengths, >=2 weaknesses, 2-3 improvement suggestions.
+
+Return JSON:
+{
+    "proposals": [
+        {"proposal_id": 0, "spark": "...",
+         "novelty_reasoning": "...", "novelty": 2,
+         "clarity_reasoning": "...", "clarity": 3,
+         "significance_reasoning": "...", "significance": 2,
+         "feasibility_reasoning": "...", "feasibility": 3,
+         "soundness_reasoning": "...", "soundness": 2,
+         "strengths": ["..."], "weaknesses": ["..."],
+         "improvement_suggestions": ["..."],
+         "overall_reasoning": "...", "overall": 3}, ...
+    ]
+}

@@ -1,0 +1,48 @@
+# Shared Claude Code context. These instructions are not composed into CodeArkt.
+language: |
+  ## Output language
+  Write user-facing text in Russian unless the user explicitly requests another language.
+  All assistant text messages are shown in the UI, including progress updates, waiting
+  messages and specialist final replies; write these in Russian too.
+  This also includes result documents, approval documents, research notes, experiment summaries,
+  article prose, table headings and figure captions/labels. Text values in a summary JSON
+  are user-facing too. Preserve source data, identifiers, code, filenames, JSON keys,
+  bibliography titles and quotations in their original form.
+  Task descriptions inside Agent tool calls may be in English. An English assignment
+  does not change the language of the saved user-facing artifacts. Forward any explicit
+  user language override when delegating. Translate and explain findings without changing
+  the evidence; use clear scientific prose, not transliteration.
+workspace: |
+  ## Session files
+  SESSION_WORKSPACE: {{SESSION_WORKSPACE}}
+  This is the absolute root and initial cwd for the manager and every specialist.
+  Paths in assignments and artifact links are relative to this root, not the
+  application repository. `mle/` is an artifact folder, not a separate agent cwd.
+  Read requires an absolute file_path. For `mle/results/example.json`, use
+  `{{SESSION_WORKSPACE}}/mle/results/example.json`. Follow each native file tool's
+  path contract; use this same root for absolute Write/Edit paths.
+  Native file tools and native Bash share these saved workspace files. When Bash is
+  available, the Docker workspace uses the same absolute path and starts at this root.
+  Relative Bash paths follow its current cwd; account for any directory change.
+  Only the shared workspace is common to both environments: Docker `/tmp` and
+  installed packages are not visible to host Read. Save rendered PDF pages and
+  other images for Read under this workspace (for example `.cache/pdf-pages/`).
+  Conversely, host SDK result files outside the workspace must be read with
+  native file tools, in bounded fragments when large, not through Docker Bash.
+  Write research artifacts only inside this workspace. Do not prepend another
+  `workdir/<session>/` to a session-relative path. If a tool returns a path prefixed
+  with `/workdir/<session ID>/` or `<session ID>/`, resolve the remaining path from
+  SESSION_WORKSPACE before using native file tools.
+  Academia file tools use their own `/workdir` root containing all sessions.
+  Pass the provided session ID followed by the session-relative path, such as
+  `<session ID>/paper.pdf`, rather than the host's absolute path or `paper.pdf` alone.
+  Remote-tool paths refer to the remote machine; download results to this local
+  session workspace before referring to them with native file tools or artifact links.
+local_execution: |
+  ## Local command execution
+  Your native Bash tool runs in this research session's persistent Docker environment.
+  Python and installed packages belong to the container; host shell customizations
+  and programs outside the workspace are not available. Use native Bash for local
+  commands, including scripts and package installation. Use run_in_background for
+  long jobs and TaskStop to stop them; detached daemons do not outlive their command
+  or the research iteration. Do not invoke Docker yourself.

@@ -1,0 +1,49 @@
+from pathlib import Path
+from typing import Optional
+
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    BASE_URL: str = "https://openrouter.ai/api/v1"
+
+    OPENROUTER_API_KEY: str = ""
+    TAVILY_API_KEY: Optional[str] = None
+    EXA_API_KEY: Optional[str] = None
+    BRAVE_API_KEY: Optional[str] = None
+    SEARXNG_URL: Optional[str] = None
+    OPENAI_API_KEY: Optional[str] = None
+
+    REVIEW_MODEL_NAME: str = "google/gemini-3.5-flash"
+    REVIEW_MAX_COMPLETION_TOKENS: int = 32768
+    BITFLIP_MODEL_NAME: str = "deepseek/deepseek-chat-v3-0324"
+    BITFLIP_MAX_COMPLETION_TOKENS: int = 16384
+    DOCUMENT_QA_MODEL_NAME: str = "deepseek/deepseek-chat-v3-0324"
+    DOCUMENT_QA_QUESTION_MAX_LENGTH: int = 10000
+    DOCUMENT_QA_DOCUMENT_MAX_LENGTH: int = 200000
+    DESCRIBE_IMAGE_MODEL_NAME: str = "gpt-4.1"
+
+    WEBSHARE_PROXY_USERNAME: Optional[str] = None
+    WEBSHARE_PROXY_PASSWORD: Optional[str] = None
+
+    PORT: int = 5056
+    WORKSPACE_OUTPUT: Optional[Path] = "benchmark/output/"
+    WORKSPACE_INPUT: Optional[Path] = "benchmark/input/"
+    WORKSPACE_BASE: Optional[Path] = "benchmark/base/"
+
+    ENABLE_AUTH: bool = False
+    TOKENS_FILE: Path = Path.cwd() / "tokens.json"
+
+    S2_PROXY_ENABLED: bool = False
+    S2_MAX_RETRIES: int = 3
+    PROXY_LIST_FILE: Path = Path.cwd() / "proxies.txt"
+
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        env_prefix="",
+        extra="ignore",
+    )
+
+
+settings = Settings()

@@ -1,0 +1,19 @@
+{
+  "rules": "78664c6729400231065a866facfa3ecdc12bf14b7113728f1842bdbcdd095019",
+  "sources=False,plan=False,status=required": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sources=False,plan=False,status=pending": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sources=False,plan=False,status=approved": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sources=False,plan=False,status=auto_approved": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "sources=True,plan=False,status=required": "72972d175b62568968dec60a804cc36401a00c3307ade622762df651db2f5234",
+  "sources=True,plan=False,status=pending": "5f69eb82c2ef809a3eb90e9f098267859f05efb7e6a1401467474f4705595f30",
+  "sources=True,plan=False,status=approved": "f7de3e27da3dfa67d9b4d31466a02fcb38918fb5c90570d1c2776252c0036051",
+  "sources=True,plan=False,status=auto_approved": "f04f44e0c3832c5886daf14e88721bb2e0b815761d027410399c243cbdbc78dd",
+  "sources=False,plan=True,status=required": "c7150e240b87d32b36cf750defadffef5aa1a4a243db429b5faed67e1086429e",
+  "sources=False,plan=True,status=pending": "5d526e0621ce018d00d2ad517a289c945117526438bebce7dffa188161d3ca14",
+  "sources=False,plan=True,status=approved": "6b0cf634861953efec459765ce7640ac92345d8f7e55c19dab30826980b70725",
+  "sources=False,plan=True,status=auto_approved": "30b8f89ef40cdc7ed8ae2915c72b23de23e1cfb4e733443d953d57f6d09628a3",
+  "sources=True,plan=True,status=required": "0b0beb81cd1067013d29aec7c271e4840e4d6aaf2567628ace09b0cca2a2c5e9",
+  "sources=True,plan=True,status=pending": "29a04391b670b3a455e581f306a221f23015f99bdf097dcdc82839b5acba2fbb",
+  "sources=True,plan=True,status=approved": "78d8cdb9a6e8fa8db12b4c8680f160bb2b72af2508f2c4d7e63ee067ae5c0402",
+  "sources=True,plan=True,status=auto_approved": "1cb82cbd718b83a71cc35d37b20fb10b6acb09cef8fd346c559725a34e8219f0"
+}

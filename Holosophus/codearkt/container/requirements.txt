@@ -1,0 +1,6 @@
+fastapi
+uvicorn
+requests
+mcp[http]==1.10.1
+pandas
+xmltodict

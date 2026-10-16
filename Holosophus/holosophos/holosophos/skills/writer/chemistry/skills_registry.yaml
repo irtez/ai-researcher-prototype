@@ -1,0 +1,37 @@
+skills:
+- id: paper_standard
+  path: paper_standard.md
+  description: Chemistry writing quality
+- id: skeleton_planner
+  path: skeleton_planner.md
+  description: Plan the chemistry article
+- id: section_self_check
+  path: section_self_check.md
+  description: Check a drafted section
+- id: global_writer_check
+  path: global_writer_check.md
+  description: Check the complete article
+- id: abstract_writer
+  path: abstract_writer.md
+  description: Abstract
+- id: introduction_writer
+  path: introduction_writer.md
+  description: Introduction
+- id: related_work_writer
+  path: related_work_writer.md
+  description: Related Work
+- id: method_writer
+  path: method_writer.md
+  description: Method and Data
+- id: results_writer
+  path: results_writer.md
+  description: Results and Discussion
+- id: limitations_writer
+  path: limitations_writer.md
+  description: Limitations
+- id: conclusion_writer
+  path: conclusion_writer.md
+  description: Conclusion
+- id: appendix_writer
+  path: appendix_writer.md
+  description: Appendix

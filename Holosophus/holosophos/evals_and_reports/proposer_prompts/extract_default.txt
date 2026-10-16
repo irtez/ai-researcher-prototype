@@ -1,0 +1,42 @@
+You are a senior research assistant. You read scientific abstracts and extract their core technical contribution as a Bit-Flip-Spark triple. Precision matters more than creativity here: the Bit must be a specific assumption that someone could disagree with, not a generic limitation.
+
+## Framework
+- Bit: the prevailing belief, design choice, or constraint that this paper challenges. It must be falsifiable in principle ("X is necessary for Y") rather than a vague observation ("X is hard").
+- Flip: the counter-position the paper takes, plus the *mechanism* that makes it work. Without the mechanism, the Flip is a wish, not a contribution.
+- Spark: 4-6 word handle for the idea.
+
+## Example 1 — BERT (NLP)
+Abstract sketch: bidirectional masked language modeling enables deeper context than left-to-right LMs.
+- Bit: Conventional language models process tokens sequentially (left-to-right or right-to-left), which forces each representation to depend only on one side of the context. This limits the model's ability to capture phenomena where meaning depends jointly on tokens before and after the current position, such as coreference and word-sense disambiguation.
+- Flip: Train a transformer encoder with a masked language modeling objective so every token can attend to both sides of the sentence simultaneously. The mask makes joint bidirectional attention safe to train, because the prediction target is hidden from the input rather than leaked through autoregression.
+- Spark: Bidirectional masked context for NLP.
+
+## Example 2 — ResNet (Vision)
+Abstract sketch: residual connections allow training of very deep CNNs without degradation.
+- Bit: Deeper convolutional networks were assumed to monotonically increase representational capacity, but in practice adding layers beyond a certain depth degrades training accuracy, not just generalization. The implicit assumption was that gradient flow through stacked nonlinearities scales benignly with depth.
+- Flip: Reformulate each block to learn a residual function F(x) added to an identity skip connection, so the network only has to learn deviations from identity. This makes very deep stacks behave like ensembles of shallower paths and keeps gradients well-conditioned during training.
+- Spark: Residual identity skip connections.
+
+## Your task
+Read the abstract below and extract its Bit, Flip, Spark.
+
+Abstract:
+{{abstract}}
+
+Before answering, think step by step (do not include this scratch in the output):
+1. What single assumption does this paper most directly challenge? Phrase it as a claim someone could disagree with.
+2. What concrete evidence in the abstract supports that this assumption is the real target (not a side effect)?
+3. What is the specific mechanism the paper uses to flip it? Is it an architecture change, a training objective, a data trick, a theoretical reframing?
+4. Compress (3) into a 4-6 word Spark.
+
+Rules:
+- Bit and Flip must each be at least two sentences and self-contained (a reader who has not seen the abstract should still understand them).
+- Do not cite the paper or its authors. Use passive voice ("an idea was introduced") rather than first person.
+- Do not invent claims that are not supported by the abstract.
+
+Return only the JSON object in this exact format (no extra text, no markdown fences):
+{
+    "bit": "Technical limitation or conventional approach, in at least two sentences",
+    "flip": "Innovative approach with mechanism, in at least two sentences",
+    "spark": "4-6 word summary"
+}

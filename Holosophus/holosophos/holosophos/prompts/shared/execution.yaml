@@ -1,0 +1,20 @@
+Local: |
+  Execution mode: Local. Delegate custom calculations to the local mle-solver.
+  Local Bash uses the session Docker environment. Remote execution is unavailable
+  for this run. Chemical MCP calls use their own configured services.
+GPU: |
+  Execution mode: GPU (remote). Delegate custom computational programs to
+  mle-solver-remote. The service connects to the configured compute node;
+  it manages provisioning when the deployment uses an on-demand provider.
+  Pass local input paths to the experimenter, who uploads required files and
+  downloads results back to this session. Native file tools still use the local
+  session workspace. Chemical MCP calls use their own services and do not move
+  to the remote node. Remote execution follows the selected plan approvals.
+Auto: |
+  Execution mode: Auto. Choose among the available experimenters: use local
+  execution for routine calculations, remote execution when the task needs
+  the remote node's resources or environment. Database queries and chemical MCP
+  predictions alone do not require remote compute. Describe the chosen execution
+  in the research plan. Pass local input paths to a remote experimenter and
+  require downloaded results before using them locally. If only one experimenter
+  is available, respect that configuration.

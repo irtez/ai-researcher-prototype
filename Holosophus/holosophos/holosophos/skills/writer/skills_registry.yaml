@@ -1,0 +1,142 @@
+skills:
+  # --- General writing skills ---
+  - id: paper_standard
+    path: holosophos/holosophos/skills/writer/paper_standard.md
+    description: "Default standard for evidence-based articles, comparisons, reproductions and reports; scope, length and methods follow the actual task."
+    triggers:
+      - write a paper
+      - article
+      - report
+      - comparison
+      - reproduction
+
+  - id: a_star_conference_paper
+    path: holosophos/holosophos/skills/writer/a_star_conference_paper.md
+    description: "Optional guidance only for an explicitly requested A*/top-tier ML/AI/NLP submission. Use actual venue rules and task-specific length."
+    triggers:
+      - A* conference
+      - top-tier conference
+      - ICML
+      - NeurIPS
+      - ICLR
+      - ACL
+      - EMNLP
+      - explicitly requested conference submission
+
+  - id: skeleton_planner
+    path: holosophos/holosophos/skills/writer/skeleton_planner.md
+    description: "Build a structured paper skeleton before writing any section content. Defines skeleton fields, argument flow, evidence planning, and page budget."
+    triggers:
+      - skeleton
+      - paper plan
+      - paper outline
+      - paper structure
+      - full paper
+      - write a paper
+
+  - id: section_self_check
+    path: holosophos/holosophos/skills/writer/section_self_check.md
+    description: "Internal Writer quality gate run after each section draft. Checks skeleton alignment, evidence support, claim calibration, and anti-hallucination compliance."
+    triggers:
+      - section check
+      - self-check
+      - quality gate
+      - section review
+
+  - id: global_writer_check
+    path: holosophos/holosophos/skills/writer/global_writer_check.md
+    description: "Full-paper coherence and completeness pass run after all sections are assembled. Checks claim consistency, evidence alignment, transitions, density, and remaining TODOs."
+    triggers:
+      - global check
+      - full paper check
+      - paper review
+      - coherence check
+      - final check
+
+  # --- Section-specific writing skills ---
+  - id: abstract_writer
+    path: holosophos/holosophos/skills/writer/abstract_writer.md
+    description: "Guide for drafting the Abstract section. Covers required content (problem, gap, approach, results, significance), task-specific length, and common failure modes."
+    triggers:
+      - abstract
+      - write abstract
+
+  - id: introduction_writer
+    path: holosophos/holosophos/skills/writer/introduction_writer.md
+    description: "Guide for drafting the Introduction section. Covers problem framing, gap identification, contribution list, and paper organization."
+    triggers:
+      - introduction
+      - write introduction
+
+  - id: related_work_writer
+    path: holosophos/holosophos/skills/writer/related_work_writer.md
+    description: "Guide for drafting the Related Work section. Covers thematic grouping, positioning, gap reinforcement, and citation integrity."
+    triggers:
+      - related work
+      - literature review
+      - prior work
+
+  - id: method_writer
+    path: holosophos/holosophos/skills/writer/method_writer.md
+    description: "Guide for drafting the Method section. Covers problem formulation, approach description, design rationale, notation, and pseudocode."
+    triggers:
+      - method
+      - methodology
+      - approach
+      - proposed method
+
+  - id: experimental_setup_writer
+    path: holosophos/holosophos/skills/writer/experimental_setup_writer.md
+    description: "Guide for drafting the Experimental Setup section. Covers datasets, baselines, metrics, implementation details, and reproducibility."
+    triggers:
+      - experimental setup
+      - experiments
+      - evaluation setup
+
+  - id: results_writer
+    path: holosophos/holosophos/skills/writer/results_writer.md
+    description: "Guide for drafting the Results section. Covers main results, baseline comparisons, key observations, and statistical reporting."
+    triggers:
+      - results
+      - main results
+      - experimental results
+
+  - id: analysis_ablations_writer
+    path: holosophos/holosophos/skills/writer/analysis_ablations_writer.md
+    description: "Guide for drafting the Analysis/Ablations section. Covers ablation studies, sensitivity analysis, error analysis, and qualitative examples."
+    triggers:
+      - analysis
+      - ablations
+      - ablation study
+      - error analysis
+
+  - id: limitations_writer
+    path: holosophos/holosophos/skills/writer/limitations_writer.md
+    description: "Guide for drafting the Limitations section. Covers methodological, data, evaluation, and generalization limitations."
+    triggers:
+      - limitations
+      - weaknesses
+
+  - id: ethics_broader_impact_writer
+    path: holosophos/holosophos/skills/writer/ethics_broader_impact_writer.md
+    description: "Guide for drafting the Ethics/Broader Impact section. Covers societal impacts, dual-use risks, bias, privacy, and mitigation strategies."
+    triggers:
+      - ethics
+      - broader impact
+      - societal impact
+
+  - id: conclusion_writer
+    path: holosophos/holosophos/skills/writer/conclusion_writer.md
+    description: "Guide for drafting the Conclusion section. Covers summary, key takeaways, implications, and future work."
+    triggers:
+      - conclusion
+      - summary
+      - concluding remarks
+
+  - id: appendix_writer
+    path: holosophos/holosophos/skills/writer/appendix_writer.md
+    description: "Guide for drafting the Appendix. Covers supplementary material selection, forward reference fulfillment, and core-content separation."
+    triggers:
+      - appendix
+      - supplementary material
+      - supplementary

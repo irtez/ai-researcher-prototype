@@ -1,0 +1,312 @@
+services:
+  langfuse-server:
+    image: docker.io/langfuse/langfuse:2.95
+    restart: unless-stopped
+    depends_on:
+      langfuse-db:
+        condition: service_healthy
+    ports:
+      - "${LANGFUSE_PORT:-3050}:3000"
+    environment:
+      DATABASE_URL: postgresql://${LANGFUSE_POSTGRES_USER:-postgres}:${LANGFUSE_POSTGRES_PASSWORD:-postgres}@langfuse-db:5432/${LANGFUSE_POSTGRES_DB:-postgres}
+      NEXTAUTH_SECRET: ${LANGFUSE_NEXTAUTH_SECRET:-replace_me_langfuse_nextauth_secret}
+      SALT: ${LANGFUSE_SALT:-replace_me_langfuse_salt}
+      ENCRYPTION_KEY: ${LANGFUSE_ENCRYPTION_KEY:-0000000000000000000000000000000000000000000000000000000000000000}
+      NEXTAUTH_URL: ${LANGFUSE_HOST:-http://localhost:3050}
+      # Headless bootstrap v2 (CodeArkt-путь). Секреты берутся из .env (host = :3050):
+      # плоские LANGFUSE_PUBLIC_KEY/SECRET_KEY и LANGFUSE_INIT_USER_PASSWORD.
+      LANGFUSE_INIT_ORG_ID: holosophus
+      LANGFUSE_INIT_ORG_NAME: Holosophus
+      LANGFUSE_INIT_PROJECT_ID: holosophus
+      LANGFUSE_INIT_PROJECT_NAME: holosophus
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_SECRET_KEY}
+      LANGFUSE_INIT_USER_EMAIL: alekseystepin13@gmail.com
+      LANGFUSE_INIT_USER_NAME: Aleksei
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:-changeme}
+    env_file:
+      - .env
+
+  langfuse-db:
+    image: docker.io/postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${LANGFUSE_POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${LANGFUSE_POSTGRES_PASSWORD:-postgres}
+      POSTGRES_DB: ${LANGFUSE_POSTGRES_DB:-postgres}
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - langfuse_database_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${LANGFUSE_POSTGRES_USER:-postgres}"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  academia:
+    build:
+      context: .
+      dockerfile: academia_mcp/Dockerfile
+    command: ["python", "-m", "academia_mcp", "--transport", "streamable-http", "--host", "0.0.0.0", "--port", "${ACADEMIA_PORT:-5056}"]
+    ports:
+      - "${ACADEMIA_PORT:-5056}:${ACADEMIA_PORT:-5056}"
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os,socket; p=int(os.environ.get('ACADEMIA_PORT',5056)); s=socket.socket(); s.settimeout(1); s.connect(('localhost',p)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+    environment:
+      - WORKSPACE_DIR=/workdir
+    volumes:
+      - ./workdir:/workdir
+      - paper_registry_state:/workdir/.paper_registry
+    env_file:
+      - .env
+
+  mle_kit:
+    build:
+      context: ./mle_kit_mcp
+      dockerfile: Dockerfile
+    command: ["python", "-m", "mle_kit_mcp", "--transport", "streamable-http", "--host", "0.0.0.0", "--port", "${MLE_KIT_PORT:-5057}"]
+    ports:
+      - "${MLE_KIT_PORT:-5057}:${MLE_KIT_PORT:-5057}"
+    environment:
+      - WORKSPACE_DIR=/workdir
+      - HOST_WORKSPACE_DIR=${HOST_WORKSPACE_DIR:-${PWD}/workdir}
+      - REMOTE_PROVIDER=${REMOTE_PROVIDER:-vast}
+      - CLOUDRU_SSH_HOST=${CLOUDRU_SSH_HOST:-}
+      - CLOUDRU_SSH_PORT=${CLOUDRU_SSH_PORT:-2222}
+      - CLOUDRU_SSH_USER=${CLOUDRU_SSH_USER:-}
+      - CLOUDRU_SSH_KEY=/root/.ssh/cloudru_key
+      - CLOUDRU_REMOTE_HOME=${CLOUDRU_REMOTE_HOME:-/home/jovyan}
+    volumes:
+      - ./workdir:/workdir
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${CLOUDRU_SSH_KEY_HOST_PATH:-/dev/null}:/root/.ssh/cloudru_key:ro
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import os,socket; p=int(os.environ.get('MLE_KIT_PORT',5057)); s=socket.socket(); s.settimeout(1); s.connect(('localhost',p)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+    env_file:
+      - .env
+
+  # Second MLE Kit instance for parallel research runs that need disjoint
+  # remote-GPU pools or different REMOTE_PROVIDER values per session.
+  # Only starts with: docker compose --profile parallel up -d  (or `make up-mcp-parallel`).
+  # Heavy on host RAM/CPU — keep at 1 unless you actually need provider isolation.
+  mle_kit_2:
+    build:
+      context: ./mle_kit_mcp
+      dockerfile: Dockerfile
+    command: ["python", "-m", "mle_kit_mcp", "--transport", "streamable-http", "--host", "0.0.0.0", "--port", "5058"]
+    ports:
+      - "5058:5058"
+    environment:
+      - WORKSPACE_DIR=/workdir
+      - HOST_WORKSPACE_DIR=${HOST_WORKSPACE_DIR:-${PWD}/workdir}
+      - REMOTE_PROVIDER=${REMOTE_PROVIDER:-vast}
+      - CLOUDRU_SSH_HOST=${CLOUDRU_SSH_HOST:-}
+      - CLOUDRU_SSH_PORT=${CLOUDRU_SSH_PORT:-2222}
+      - CLOUDRU_SSH_USER=${CLOUDRU_SSH_USER:-}
+      - CLOUDRU_SSH_KEY=/root/.ssh/cloudru_key
+      - CLOUDRU_REMOTE_HOME=${CLOUDRU_REMOTE_HOME:-/home/jovyan}
+    volumes:
+      - ./workdir:/workdir
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ${CLOUDRU_SSH_KEY_HOST_PATH:-/dev/null}:/root/.ssh/cloudru_key:ro
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s=socket.socket(); s.settimeout(1); s.connect(('localhost',5058)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+    env_file:
+      - .env
+    profiles:
+      - parallel
+
+  paperbanana-mcp:
+    build:
+      context: .
+      dockerfile: docker/paperbanana-mcp.Dockerfile
+      args:
+        PAPERBANANA_GIT_URL: ${PAPERBANANA_GIT_URL:-https://github.com/llmsresearch/paperbanana.git}
+        PAPERBANANA_GIT_REF: ${PAPERBANANA_GIT_REF:-v0.1.2}
+    ports:
+      - "${PAPERBANANA_PORT:-5060}:5060"
+    environment:
+      - VLM_PROVIDER=${PAPERBANANA_VLM_PROVIDER:-openrouter}
+      - VLM_MODEL=${PAPERBANANA_VLM_MODEL:-google/gemini-3-flash-preview}
+      - IMAGE_PROVIDER=${PAPERBANANA_IMAGE_PROVIDER:-openrouter_imagen}
+      - IMAGE_MODEL=${PAPERBANANA_IMAGE_MODEL:-google/gemini-3-pro-image-preview}
+      - REFINEMENT_ITERATIONS=${PAPERBANANA_REFINEMENT_ITERATIONS:-2}
+      - PAPERBANANA_VLM_TIMEOUT=${PAPERBANANA_VLM_TIMEOUT:-300}
+      - PAPERBANANA_IMAGE_TIMEOUT=${PAPERBANANA_IMAGE_TIMEOUT:-600}
+      - PAPERBANANA_PLOT_EXEC_TIMEOUT=${PAPERBANANA_PLOT_EXEC_TIMEOUT:-180}
+      - OUTPUT_DIR=/workdir/figures/paperbanana
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY}
+      - GOOGLE_API_KEY=${GOOGLE_API_KEY:-}
+      - WORKSPACE_DIR=/workdir
+    volumes:
+      - ./workdir:/workdir
+    healthcheck:
+      test: ["CMD", "python3", "-c", "import socket; s=socket.socket(); s.settimeout(1); s.connect(('localhost', 5060)); s.close()"]
+      interval: 5s
+      timeout: 2s
+      retries: 30
+    env_file:
+      - .env
+
+  # ── Langfuse v3 (OTel-compatible, for langsmith bridge) ──
+  # Based on official docker-compose: https://github.com/langfuse/langfuse/blob/main/docker-compose.yml
+  # Worker MUST come before web (YAML anchor ordering)
+  langfuse-v3-worker:
+    image: langfuse/langfuse-worker:3
+    restart: unless-stopped
+    depends_on: &langfuse-v3-deps
+      langfuse-v3-db:
+        condition: service_healthy
+      langfuse-v3-clickhouse:
+        condition: service_healthy
+      langfuse-v3-redis:
+        condition: service_healthy
+      langfuse-v3-minio:
+        condition: service_healthy
+    environment: &langfuse-v3-worker-env
+      DATABASE_URL: postgresql://postgres:postgres@langfuse-v3-db:5432/postgres
+      CLICKHOUSE_URL: http://langfuse-v3-clickhouse:8123
+      CLICKHOUSE_MIGRATION_URL: clickhouse://langfuse-v3-clickhouse:9000
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse
+      CLICKHOUSE_CLUSTER_ENABLED: "false"
+      REDIS_HOST: langfuse-v3-redis
+      REDIS_PORT: "6379"
+      REDIS_AUTH: redissecret
+      SALT: langfuse-v3-salt-holosophus-2026
+      ENCRYPTION_KEY: "0000000000000000000000000000000000000000000000000000000000000000"
+      # S3 / MinIO — per-bucket config (official pattern)
+      LANGFUSE_S3_EVENT_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_EVENT_UPLOAD_REGION: auto
+      LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY: miniosecret
+      LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT: http://langfuse-v3-minio:9000
+      LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_EVENT_UPLOAD_PREFIX: events/
+      LANGFUSE_S3_MEDIA_UPLOAD_BUCKET: langfuse
+      LANGFUSE_S3_MEDIA_UPLOAD_REGION: auto
+      LANGFUSE_S3_MEDIA_UPLOAD_ACCESS_KEY_ID: minio
+      LANGFUSE_S3_MEDIA_UPLOAD_SECRET_ACCESS_KEY: miniosecret
+      LANGFUSE_S3_MEDIA_UPLOAD_ENDPOINT: http://langfuse-v3-minio:9000
+      LANGFUSE_S3_MEDIA_UPLOAD_FORCE_PATH_STYLE: "true"
+      LANGFUSE_S3_MEDIA_UPLOAD_PREFIX: media/
+      LANGFUSE_S3_BATCH_EXPORT_ENABLED: "false"
+
+  langfuse-v3:
+    image: langfuse/langfuse:3
+    restart: unless-stopped
+    depends_on: *langfuse-v3-deps
+    ports:
+      - "3051:3000"
+    environment:
+      <<: *langfuse-v3-worker-env
+      NEXTAUTH_SECRET: langfuse-v3-secret-holosophus-2026
+      NEXTAUTH_URL: http://localhost:3051
+      HOSTNAME: "0.0.0.0"
+      # Headless bootstrap: создаёт org/project/user и предопределённые API-ключи
+      # при первом старте на пустой БД. Секреты берутся из .env (LANGFUSE_*_V3).
+      LANGFUSE_INIT_ORG_ID: holosophus
+      LANGFUSE_INIT_ORG_NAME: Holosophus
+      LANGFUSE_INIT_PROJECT_ID: holosophus
+      LANGFUSE_INIT_PROJECT_NAME: holosophus
+      LANGFUSE_INIT_PROJECT_PUBLIC_KEY: ${LANGFUSE_PUBLIC_KEY_V3}
+      LANGFUSE_INIT_PROJECT_SECRET_KEY: ${LANGFUSE_SECRET_KEY_V3}
+      LANGFUSE_INIT_USER_EMAIL: alekseystepin13@gmail.com
+      LANGFUSE_INIT_USER_NAME: Aleksei
+      LANGFUSE_INIT_USER_PASSWORD: ${LANGFUSE_INIT_USER_PASSWORD:-changeme}
+
+  langfuse-v3-db:
+    image: postgres:17
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: postgres
+      TZ: UTC
+      PGTZ: UTC
+    volumes:
+      - langfuse_v3_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+      start_period: 30s
+
+  langfuse-v3-clickhouse:
+    image: clickhouse/clickhouse-server
+    restart: unless-stopped
+    user: "101:101"
+    environment:
+      CLICKHOUSE_DB: default
+      CLICKHOUSE_USER: clickhouse
+      CLICKHOUSE_PASSWORD: clickhouse
+    volumes:
+      - langfuse_v3_ch_data:/var/lib/clickhouse
+      - langfuse_v3_ch_logs:/var/log/clickhouse-server
+    healthcheck:
+      test: ["CMD-SHELL", "wget --no-verbose --tries=1 --spider http://localhost:8123/ping || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 1s
+
+  langfuse-v3-redis:
+    image: redis:7
+    restart: unless-stopped
+    command: redis-server --requirepass redissecret
+    volumes:
+      - langfuse_v3_redis:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "redissecret", "ping"]
+      interval: 3s
+      timeout: 3s
+      retries: 10
+
+  langfuse-v3-minio:
+    image: minio/minio
+    restart: unless-stopped
+    command: server /data --address ":9000" --console-address ":9001"
+    environment:
+      MINIO_ROOT_USER: minio
+      MINIO_ROOT_PASSWORD: miniosecret
+    volumes:
+      - langfuse_v3_minio:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  # MinIO bucket init (one-shot)
+  langfuse-v3-minio-init:
+    image: minio/mc
+    depends_on:
+      langfuse-v3-minio:
+        condition: service_healthy
+    restart: "no"
+    entrypoint: >
+      /bin/sh -c "
+      mc alias set myminio http://langfuse-v3-minio:9000 minio miniosecret &&
+      mc mb --ignore-existing myminio/langfuse
+      "
+
+volumes:
+  paper_registry_state:
+  langfuse_database_data:
+  langfuse_v3_pgdata:
+  langfuse_v3_ch_data:
+  langfuse_v3_ch_logs:
+  langfuse_v3_redis:
+  langfuse_v3_minio:

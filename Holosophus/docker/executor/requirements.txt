@@ -1,0 +1,4 @@
+# Linux amd64 / Python 3.11, matching the pinned CUDA base image.
+# Keep its existing NumPy/Pillow and ML packages: install with --no-deps.
+rdkit==2025.9.6 --hash=sha256:3f4fc084890efb29b51ea4679bb07d28b276b6e73e3381e678a5ba057b4c4222
+PyMuPDF==1.27.1 --hash=sha256:aeaed76e72cbc061149a825ab0811c5f4752970c56591c2938c5042ec06b26e1

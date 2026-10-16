@@ -1,0 +1,297 @@
+[
+  {
+    "pdf": "/home/borist/projects/ai_scientists/Holosophus/holosophos/tests/tools/writer/paper_examples/1706.03762.pdf",
+    "filename": "1706.03762.pdf",
+    "report": {
+      "tool_name": "paper_length",
+      "total_pages": 15,
+      "sections": [
+        {
+          "component": "Abstract",
+          "matched_titles": [
+            "Abstract"
+          ],
+          "found": true,
+          "start_page": 1,
+          "end_page": 2,
+          "page_span": 2,
+          "fractional_pages": 0.61
+        },
+        {
+          "component": "Introduction",
+          "matched_titles": [
+            "Introduction"
+          ],
+          "found": true,
+          "start_page": 2,
+          "end_page": 2,
+          "page_span": 1,
+          "fractional_pages": 0.37
+        },
+        {
+          "component": "Related Work",
+          "matched_titles": [
+            "Background"
+          ],
+          "found": true,
+          "start_page": 2,
+          "end_page": 8,
+          "page_span": 7,
+          "fractional_pages": 5.68
+        },
+        {
+          "component": "Method",
+          "matched_titles": [
+            "Model"
+          ],
+          "found": true,
+          "start_page": 8,
+          "end_page": 8,
+          "page_span": 1,
+          "fractional_pages": 0.33
+        },
+        {
+          "component": "Experimental Setup",
+          "matched_titles": [],
+          "found": false,
+          "start_page": null,
+          "end_page": null,
+          "page_span": null,
+          "fractional_pages": null
+        },
+        {
+          "component": "Results",
+          "matched_titles": [
+            "Results"
+          ],
+          "found": true,
+          "start_page": 8,
+          "end_page": 10,
+          "page_span": 3,
+          "fractional_pages": 1.99
+        },
+        {
+          "component": "Analysis / Ablations",
+          "matched_titles": [],
+          "found": false,
+          "start_page": null,
+          "end_page": null,
+          "page_span": null,
+          "fractional_pages": null
+        },
+        {
+          "component": "Limitations / Ethics / Reproducibility",
+          "matched_titles": [],
+          "found": false,
+          "start_page": null,
+          "end_page": null,
+          "page_span": null,
+          "fractional_pages": null
+        },
+        {
+          "component": "Conclusion",
+          "matched_titles": [
+            "Conclusion"
+          ],
+          "found": true,
+          "start_page": 10,
+          "end_page": 10,
+          "page_span": 1,
+          "fractional_pages": 0.25
+        }
+      ],
+      "other_detected_headings": [
+        "Acknowledgements",
+        "References"
+      ],
+      "diagnostics": [
+        "section_not_found: Experimental Setup",
+        "section_not_found: Analysis / Ablations",
+        "section_not_found: Limitations / Ethics / Reproducibility"
+      ]
+    },
+    "summary": {
+      "total_pages": 15,
+      "found_components": [
+        "Abstract",
+        "Introduction",
+        "Related Work",
+        "Method",
+        "Results",
+        "Conclusion"
+      ],
+      "missing_components": [
+        "Experimental Setup",
+        "Analysis / Ablations",
+        "Limitations / Ethics / Reproducibility"
+      ],
+      "fractional_pages": {
+        "Abstract": 0.61,
+        "Introduction": 0.37,
+        "Related Work": 5.68,
+        "Method": 0.33,
+        "Results": 1.99,
+        "Conclusion": 0.25
+      },
+      "other_detected_headings": [
+        "Acknowledgements",
+        "References"
+      ],
+      "diagnostics": [
+        "section_not_found: Experimental Setup",
+        "section_not_found: Analysis / Ablations",
+        "section_not_found: Limitations / Ethics / Reproducibility"
+      ]
+    }
+  },
+  {
+    "pdf": "/home/borist/projects/ai_scientists/Holosophus/holosophos/tests/tools/writer/paper_examples/1810.04805.pdf",
+    "filename": "1810.04805.pdf",
+    "report": {
+      "tool_name": "paper_length",
+      "total_pages": 16,
+      "sections": [
+        {
+          "component": "Abstract",
+          "matched_titles": [
+            "Abstract"
+          ],
+          "found": true,
+          "start_page": 1,
+          "end_page": 1,
+          "page_span": 1,
+          "fractional_pages": 0.4
+        },
+        {
+          "component": "Introduction",
+          "matched_titles": [
+            "Introduction"
+          ],
+          "found": true,
+          "start_page": 1,
+          "end_page": 2,
+          "page_span": 2,
+          "fractional_pages": 0.92
+        },
+        {
+          "component": "Related Work",
+          "matched_titles": [
+            "Related Work"
+          ],
+          "found": true,
+          "start_page": 2,
+          "end_page": 5,
+          "page_span": 4,
+          "fractional_pages": 2.94
+        },
+        {
+          "component": "Method",
+          "matched_titles": [
+            "approach."
+          ],
+          "found": true,
+          "start_page": 14,
+          "end_page": 14,
+          "page_span": 1,
+          "fractional_pages": 0.07
+        },
+        {
+          "component": "Experimental Setup",
+          "matched_titles": [],
+          "found": false,
+          "start_page": null,
+          "end_page": null,
+          "page_span": null,
+          "fractional_pages": null
+        },
+        {
+          "component": "Results",
+          "matched_titles": [
+            "Experiments",
+            "results"
+          ],
+          "found": true,
+          "start_page": 5,
+          "end_page": 16,
+          "page_span": 12,
+          "fractional_pages": 10.71
+        },
+        {
+          "component": "Analysis / Ablations",
+          "matched_titles": [],
+          "found": false,
+          "start_page": null,
+          "end_page": null,
+          "page_span": null,
+          "fractional_pages": null
+        },
+        {
+          "component": "Limitations / Ethics / Reproducibility",
+          "matched_titles": [],
+          "found": false,
+          "start_page": null,
+          "end_page": null,
+          "page_span": null,
+          "fractional_pages": null
+        },
+        {
+          "component": "Conclusion",
+          "matched_titles": [
+            "Conclusion"
+          ],
+          "found": true,
+          "start_page": 9,
+          "end_page": 10,
+          "page_span": 2,
+          "fractional_pages": 0.38
+        }
+      ],
+      "other_detected_headings": [
+        "References",
+        "1. Question:",
+        "M ASK S AME",
+        "2. Question: Does MLM pre-training converge"
+      ],
+      "diagnostics": [
+        "section_not_found: Experimental Setup",
+        "section_not_found: Analysis / Ablations",
+        "section_not_found: Limitations / Ethics / Reproducibility"
+      ]
+    },
+    "summary": {
+      "total_pages": 16,
+      "found_components": [
+        "Abstract",
+        "Introduction",
+        "Related Work",
+        "Method",
+        "Results",
+        "Conclusion"
+      ],
+      "missing_components": [
+        "Experimental Setup",
+        "Analysis / Ablations",
+        "Limitations / Ethics / Reproducibility"
+      ],
+      "fractional_pages": {
+        "Abstract": 0.4,
+        "Introduction": 0.92,
+        "Related Work": 2.94,
+        "Method": 0.07,
+        "Results": 10.71,
+        "Conclusion": 0.38
+      },
+      "other_detected_headings": [
+        "References",
+        "1. Question:",
+        "M ASK S AME",
+        "2. Question: Does MLM pre-training converge"
+      ],
+      "diagnostics": [
+        "section_not_found: Experimental Setup",
+        "section_not_found: Analysis / Ablations",
+        "section_not_found: Limitations / Ethics / Reproducibility"
+      ]
+    }
+  }
+]

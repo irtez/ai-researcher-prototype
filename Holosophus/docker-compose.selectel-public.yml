@@ -1,0 +1,24 @@
+services:
+  app:
+    ports:
+      - "127.0.0.1:${APP_PORT:-5055}:5055"
+
+  academia:
+    ports:
+      - "127.0.0.1:${ACADEMIA_PORT:-5056}:${ACADEMIA_PORT:-5056}"
+
+  mle_kit:
+    ports:
+      - "127.0.0.1:${MLE_KIT_PORT:-5057}:${MLE_KIT_PORT:-5057}"
+
+  paperbanana-mcp:
+    ports:
+      - "127.0.0.1:${PAPERBANANA_PORT:-5060}:5060"
+
+  langfuse-server:
+    ports:
+      - "127.0.0.1:${LANGFUSE_PORT:-3000}:3000"
+
+  searxng:
+    ports:
+      - "127.0.0.1:${SEARXNG_PORT:-8080}:8080"

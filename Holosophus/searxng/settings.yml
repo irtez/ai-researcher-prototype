@@ -1,0 +1,50 @@
+use_default_settings: true
+
+server:
+  secret_key: "holosophus-searxng-secret-key-2026"
+  bind_address: "0.0.0.0"
+  port: 8080
+  limiter: false
+  image_proxy: false
+  method: "GET"
+
+search:
+  safe_search: 0
+  autocomplete: ""
+  default_lang: "en"
+  ban_time_on_fail: 1
+  max_ban_time_on_fail: 10
+  formats:
+    - html
+    - json
+
+engines:
+  # Academic engines (enabled by default or explicitly)
+  - name: google scholar
+    disabled: false
+    timeout: 10.0
+  - name: arxiv
+    disabled: false
+    timeout: 10.0
+  - name: semantic scholar
+    disabled: false
+    timeout: 10.0
+  - name: pubmed
+    disabled: false
+    timeout: 10.0
+  - name: crossref
+    disabled: false
+    timeout: 30.0
+  - name: openalex
+    disabled: false
+    timeout: 10.0
+
+  # Disable unreliable engines to reduce noise
+  - name: aol
+    inactive: true
+  - name: karmasearch
+    inactive: true
+  - name: karmasearch videos
+    inactive: true
+  - name: startpage
+    inactive: true

@@ -1,0 +1,164 @@
+# Local Claude Code + UI deployment. The SDK/CLI runner stays on the host.
+# Separate project name keeps the donor checkout's containers and volumes intact.
+name: ai-researcher-claude
+
+services:
+  ui:
+    extends:
+      file: docker-compose.yml
+      service: ui
+    profiles: !reset []
+    depends_on: !override
+      ui-api:
+        condition: service_healthy
+    ports: !override
+      - "127.0.0.1:${UI_PORT:-5062}:5059"
+
+  ui-api:
+    extends:
+      file: docker-compose.yml
+      service: ui-api
+    profiles: !reset []
+    # Upload directories must be writable by the host Claude Code runner.
+    user: "${AI_RESEARCHER_UID:-1000}:${AI_RESEARCHER_GID:-1000}"
+
+  academia:
+    extends:
+      file: docker-compose.mcp.yml
+      service: academia
+    ports: !override
+      - "127.0.0.1:${ACADEMIA_PORT:-5056}:${ACADEMIA_PORT:-5056}"
+
+  mle_kit:
+    extends:
+      file: docker-compose.mcp.yml
+      service: mle_kit
+    ports: !override
+      - "127.0.0.1:${MLE_KIT_PORT:-5057}:${MLE_KIT_PORT:-5057}"
+
+  paperbanana-mcp:
+    extends:
+      file: docker-compose.mcp.yml
+      service: paperbanana-mcp
+    ports: !override
+      - "127.0.0.1:${PAPERBANANA_PORT:-5060}:5060"
+
+  writer-tools:
+    extends:
+      file: docker-compose.yml
+      service: writer-tools
+
+  chem:
+    profiles: ["chemistry"]
+    build:
+      context: ./chem_mcp
+    environment:
+      CHEM_MCP_HOST: 0.0.0.0
+      CHEM_MCP_PORT: 5058
+      WORKSPACE_DIR: /workdir
+      CHEM_DATA_DIR: /data/chemistry/datasets
+      HF_HOME: /data/chemistry/huggingface
+    volumes:
+      - ./workdir:/workdir:ro
+      - ./data/chemistry:/data/chemistry
+    ports:
+      - "127.0.0.1:${CHEM_MCP_PORT:-5063}:5058"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 5058), timeout=2).close()"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 10s
+
+  chem_conversions:
+    profiles: ["chemistry"]
+    build:
+      context: ./chem_conversions_mcp
+    command: ["python", "-m", "chem_conversions_mcp", "--transport", "streamable-http", "--host", "0.0.0.0", "--port", "5061", "--streamable-http-path", "/mcp"]
+    ports:
+      - "127.0.0.1:${CHEM_CONVERSIONS_MCP_PORT:-5064}:5061"
+    healthcheck:
+      test: ["CMD", "python", "-c", "import socket; socket.create_connection(('127.0.0.1', 5061), timeout=2).close()"]
+      interval: 5s
+      timeout: 3s
+      retries: 12
+      start_period: 5s
+
+  phoenix:
+    image: arizephoenix/phoenix:version-20.8.0
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${PHOENIX_CC_UI_PORT:-6007}:6006"
+    environment:
+      - PHOENIX_WORKING_DIR=/mnt/data
+      - PHOENIX_ALLOW_EXTERNAL_RESOURCES=false
+    volumes:
+      - phoenix_data:/mnt/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:6006/', timeout=2).close()"]
+      interval: 5s
+      timeout: 3s
+      retries: 30
+      start_period: 15s
+
+  langfuse-v3:
+    extends:
+      file: docker-compose.mcp.yml
+      service: langfuse-v3
+    ports: !override
+      - "127.0.0.1:3051:3000"
+    environment:
+      LANGFUSE_INIT_USER_EMAIL: ${LANGFUSE_INIT_USER_EMAIL:-researcher@example.invalid}
+      LANGFUSE_INIT_USER_NAME: ${LANGFUSE_INIT_USER_NAME:-Researcher}
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://127.0.0.1:3000/api/public/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
+      interval: 10s
+      timeout: 5s
+      retries: 18
+      start_period: 30s
+    depends_on:
+      langfuse-v3-minio-init:
+        condition: service_completed_successfully
+
+  langfuse-v3-worker:
+    extends:
+      file: docker-compose.mcp.yml
+      service: langfuse-v3-worker
+    depends_on:
+      langfuse-v3-minio-init:
+        condition: service_completed_successfully
+
+  langfuse-v3-db:
+    extends:
+      file: docker-compose.mcp.yml
+      service: langfuse-v3-db
+
+  langfuse-v3-clickhouse:
+    extends:
+      file: docker-compose.mcp.yml
+      service: langfuse-v3-clickhouse
+
+  langfuse-v3-redis:
+    extends:
+      file: docker-compose.mcp.yml
+      service: langfuse-v3-redis
+
+  langfuse-v3-minio:
+    extends:
+      file: docker-compose.mcp.yml
+      service: langfuse-v3-minio
+
+  langfuse-v3-minio-init:
+    extends:
+      file: docker-compose.mcp.yml
+      service: langfuse-v3-minio-init
+
+volumes:
+  paper_registry_state:
+  writer_tools_state:
+  phoenix_data:
+  langfuse_v3_pgdata:
+  langfuse_v3_ch_data:
+  langfuse_v3_ch_logs:
+  langfuse_v3_redis:
+  langfuse_v3_minio:

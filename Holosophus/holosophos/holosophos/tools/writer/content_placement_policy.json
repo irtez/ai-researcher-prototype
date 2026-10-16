@@ -1,0 +1,67 @@
+{
+  "policy_name": "a_star_ml_ai_nlp_content_placement_default",
+  "policy_version": "1.0",
+  "section_aliases": {
+    "related work": "related_work",
+    "methodology": "method",
+    "experimental setup": "experiments",
+    "evaluation": "experiments",
+    "ablations": "analysis",
+    "error analysis": "analysis",
+    "additional analysis": "analysis",
+    "ethics": "limitations",
+    "broader impact": "limitations",
+    "reproducibility": "limitations",
+    "findings": "results",
+    "conclusions": "conclusion"
+  },
+  "artifacts": {
+    "figure": {
+      "allowed_sections": ["introduction", "background", "related_work", "method", "experiments", "results", "analysis", "discussion", "limitations", "appendix"],
+      "discouraged_sections": ["abstract", "conclusion"],
+      "forbidden_sections": ["references", "bibliography"]
+    },
+    "table": {
+      "allowed_sections": ["method", "experiments", "results", "analysis", "discussion", "appendix"],
+      "discouraged_sections": ["introduction", "background", "related_work", "limitations"],
+      "forbidden_sections": ["abstract", "conclusion", "references", "bibliography"]
+    },
+    "algorithm": {
+      "allowed_sections": ["background", "method", "experiments", "appendix"],
+      "discouraged_sections": [],
+      "forbidden_sections": ["abstract", "introduction", "related_work", "results", "analysis", "discussion", "limitations", "conclusion", "references", "bibliography"]
+    },
+    "equation": {
+      "allowed_sections": ["background", "method", "experiments", "analysis", "appendix"],
+      "discouraged_sections": ["introduction", "results", "discussion", "limitations"],
+      "forbidden_sections": ["abstract", "conclusion", "references", "bibliography"]
+    },
+    "theorem": {
+      "allowed_sections": ["background", "method", "analysis", "appendix"],
+      "discouraged_sections": ["introduction", "experiments", "results", "discussion", "limitations"],
+      "forbidden_sections": ["abstract", "conclusion", "references", "bibliography"]
+    },
+    "proof": {
+      "allowed_sections": ["method", "analysis", "appendix"],
+      "discouraged_sections": ["background"],
+      "forbidden_sections": ["abstract", "introduction", "experiments", "results", "discussion", "limitations", "conclusion", "references", "bibliography"]
+    },
+    "code_listing": {
+      "allowed_sections": ["method", "experiments", "appendix"],
+      "discouraged_sections": ["background", "analysis"],
+      "forbidden_sections": ["abstract", "introduction", "related_work", "results", "discussion", "limitations", "conclusion", "references", "bibliography"]
+    }
+  },
+  "artifact_aliases": {
+    "environments": {
+    "figure": "figure", "figure*": "figure", "table": "table", "table*": "table", "longtable": "table",
+    "algorithm": "algorithm", "algorithm*": "algorithm", "algorithmic": "algorithm", "procedure": "algorithm",
+    "equation": "equation", "equation*": "equation", "align": "equation", "align*": "equation",
+    "alignat": "equation", "alignat*": "equation", "gather": "equation", "gather*": "equation",
+    "multline": "equation", "multline*": "equation", "flalign": "equation", "flalign*": "equation",
+    "theorem": "theorem", "lemma": "theorem", "proposition": "theorem", "corollary": "theorem",
+    "definition": "theorem", "assumption": "theorem", "remark": "theorem", "proof": "proof",
+      "lstlisting": "code_listing", "minted": "code_listing", "Verbatim": "code_listing", "verbatim": "code_listing"
+    }
+  }
+}

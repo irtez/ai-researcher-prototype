@@ -1,0 +1,6 @@
+# Holosophos
+- Модуль `academia_mcp/tools/web_search.py` унифицирует ответ разных веб-провайдеров (Tavily, Brave, Exa). Выбор источника идёт по запрошенному `provider`, но при отсутствии API-ключа он автоматически переключается на доступного из очереди Tavily → Brave → Exa. Запросы проходят через `get_with_retries`/`post_with_retries` с backoff, `site:`-фильтры извлекаются в `include_domains`, а контент обрезается и очищается `sanitize_output`.
+- Пакет специализированных поисков (`arxiv_search`, `anthology_search`, `hf_datasets_search`) выстраивает единый интерфейс: строгая валидация параметров, нормализация выдачи и сериализация в JSON/Pydantic-модели.
+- `arxiv_search` составляет URL с учётом дат (через `_compose_query`), парсит XML в `ArxivSearchResponse` и позволяет включать/выключать аннотации; также запрещает кириллицу и слишком широкие лимиты.
+- `anthology_search` держит ленивый singleton ACL Anthology (`Anthology.from_repo().load_all()`), поддерживает булевы операторы AND/OR/ANDNOT по полям (`ti`, `au`, `abs`, `cat`, `id`), фильтрует по годам и при необходимости сортирует по году публикации перед выдачей JSON.
+- `hf_datasets_search` использует `huggingface_hub.HfApi.list_datasets` с сортировками/фильтрами; для каждого датасета дополнительно скачивает README и кладёт метаданные (даты, лайки, теги) в JSON.

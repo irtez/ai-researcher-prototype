@@ -1,0 +1,1038 @@
+{
+  "rubric_id": "conference_reviewer_distilled_20_rubric_en_v3",
+  "version": "3.0.0",
+  "language": "en",
+  "purpose": "Evaluate scientific papers with a compact conference-reviewer-style rubric. The rubric distills a larger reproducibility and qualitative review checklist into 20 high-value metrics grouped into 5 semantically coherent LLM calls.",
+  "design_principles": [
+    "Use exactly 20 criteria to reduce judge fatigue and cross-metric bias.",
+    "Use exactly 5 groups; one LLM call should evaluate one group.",
+    "Each group contains 4 criteria that inspect related parts of the paper.",
+    "The LLM must return separate scores for each criterion, not a group score.",
+    "All aggregation must be performed programmatically after the LLM response.",
+    "Every criterion must receive a score from 0 to 2.",
+    "If the paper clearly does not use LLMs, the LLM-specific criterion can receive 2 because the LLM-related risk is absent by design.",
+    "If the paper likely uses LLMs but does not report the setup, score the LLM-specific criterion 0 or 1 depending on partial evidence.",
+    "Do not infer missing details. Missing reporting should lower the score."
+  ],
+  "reviewer_mindset": [
+    "Act as a careful conference reviewer, not a summarizer.",
+    "Ask whether a competent reviewer could trust, verify, and interpret the paper's central claims.",
+    "Reward clear problem framing, concrete contributions, fair positioning, strong evidence, honest limitations, and reproducible methodology.",
+    "Penalize vague claims, overclaiming, missing baselines, hidden assumptions, leakage risk, weak statistics, and unreproducible setup.",
+    "Use concrete evidence from the paper. Prefer section, table, figure, appendix, or artifact references when available.",
+    "If the paper does not state something, treat it as missing rather than guessing."
+  ],
+  "score_scale": {
+    "type": "ordinal",
+    "allowed_values": [
+      0,
+      1,
+      2
+    ],
+    "labels": {
+      "0": "absent_or_poor",
+      "1": "partial_unclear_or_incomplete",
+      "2": "good_sufficient_or_well_supported"
+    },
+    "global_description": {
+      "0": "The criterion is absent, seriously flawed, not reported, contradicted, or should have been addressed but was not.",
+      "1": "The criterion is partially satisfied, but important details, controls, scope, or evidence are missing.",
+      "2": "The criterion is satisfied well enough for a conference reviewer to trust, verify, or assess the relevant claim."
+    },
+    "calibration_notes": [
+      "Use 2 only when the paper gives concrete information sufficient for critical assessment.",
+      "Use 1 when the paper gestures at the issue but leaves important ambiguity.",
+      "Use 0 when the issue is absent, contradicted, too vague to evaluate, or omitted despite being relevant.",
+      "Every criterion must receive exactly one score: 0, 1, or 2.",
+      "Do not reward confident wording without evidence."
+    ]
+  },
+  "severity_scale": {
+    "allowed_values": [
+      "none",
+      "minor",
+      "major",
+      "critical"
+    ],
+    "description": {
+      "none": "No meaningful weakness for this criterion.",
+      "minor": "A weakness exists but does not materially change the paper's main claims.",
+      "major": "A weakness materially affects trust in one or more important claims.",
+      "critical": "A weakness undermines a central claim, core validity, or reproducibility of the paper."
+    }
+  },
+  "confidence_scale": {
+    "allowed_values": [
+      "low",
+      "medium",
+      "high"
+    ],
+    "description": {
+      "low": "The paper text is ambiguous or insufficiently available; the judgment is uncertain.",
+      "medium": "There is enough evidence for a plausible judgment but some ambiguity remains.",
+      "high": "The paper provides clear evidence for the judgment."
+    }
+  },
+  "per_group_output_schema": {
+    "group_id": "string",
+    "group_name": "string",
+    "criterion_results": [
+      {
+        "criterion_id": "string",
+        "score": "0 | 1 | 2",
+        "evidence": "Concrete evidence from the paper; mention section/table/figure/appendix/artifact when possible.",
+        "comment": "Brief reviewer-style justification for the score.",
+        "missing_info": [
+          "Specific details that would be needed for a higher score."
+        ],
+        "severity": "none | minor | major | critical",
+        "confidence": "low | medium | high"
+      }
+    ],
+    "group_summary": "1-3 sentences summarizing this group's local evaluation only."
+  },
+  "prompt_rules": [
+    "Evaluate only the current group.",
+    "Return exactly one result for each criterion_id in the current group.",
+    "Do not add criteria not present in the group.",
+    "Do not output an overall group score.",
+    "Do not output an overall paper recommendation inside group calls.",
+    "Do not let a positive or negative impression on one criterion change another criterion's score.",
+    "Do not invent evidence. If evidence is missing, say so explicitly.",
+    "Use score 0 or 1 when important details are missing.",
+    "Return valid JSON only in structured evaluation mode."
+  ],
+  "aggregation": {
+    "score_range": [
+      0,
+      2
+    ],
+    "total_raw_score": "sum(all_20_scores)",
+    "total_max_score": 40,
+    "normalized_total_score": "sum(all_20_scores) / 40",
+    "group_score": "sum(group_scores) / (2 * number_of_criteria_in_group)",
+    "all_criteria_have_equal_weight": true,
+    "all_groups_have_equal_number_of_criteria": true,
+    "group_count": 5,
+    "criteria_per_group": 4,
+    "criterion_count": 20,
+    "interpretation_bands": [
+      {
+        "range": [
+          0.0,
+          0.39
+        ],
+        "label": "weak",
+        "meaning": "The paper has serious issues in scientific quality, evidence, or reproducibility."
+      },
+      {
+        "range": [
+          0.4,
+          0.64
+        ],
+        "label": "borderline",
+        "meaning": "The paper has some valid elements but important weaknesses remain."
+      },
+      {
+        "range": [
+          0.65,
+          0.84
+        ],
+        "label": "solid",
+        "meaning": "The paper is mostly credible, with some limitations or missing details."
+      },
+      {
+        "range": [
+          0.85,
+          1.0
+        ],
+        "label": "strong",
+        "meaning": "The paper is well-framed, well-supported, and reproducible by conference-review standards."
+      }
+    ],
+    "important_note": "The aggregate score is a diagnostic summary, not an automatic accept/reject decision."
+  },
+  "paper_type_policy": {
+    "default": "Run all 5 groups for most scientific papers.",
+    "ml_or_llm_paper": "Run all 5 groups. D04 and D05 contain ML/LLM-specific reproducibility checks.",
+    "non_ml_empirical_paper": "Run all 5 groups. D04 and D05 should be interpreted for the relevant empirical setup.",
+    "theoretical_paper": "Run all 5 groups, but interpret data/model/statistical criteria as procedure/proof/artifact/evaluation transparency where applicable. If the paper clearly has no LLM component, score llm_setup_and_judge_reliability as 2.",
+    "survey_or_position_paper": "Run all 5 groups, interpreting evidence, protocol, and reproducibility as literature selection, taxonomy construction, source transparency, and claim support."
+  },
+  "groups": [
+    {
+      "group_id": "D01_framing_positioning_claims",
+      "module_id": "distilled_review_quality",
+      "group_name": "Framing, positioning, and claims",
+      "group_review_focus": {
+        "what_to_inspect": "Inspect whether the paper has a clear problem, meaningful contribution, fair positioning against prior work, and claims that match the evidence.",
+        "what_not_to_do": "Do not produce a general review of the paper. Do not let one criterion's score influence another. Score each criterion independently using explicit evidence."
+      },
+      "recommended_source_sections": [
+        "abstract",
+        "introduction",
+        "related work",
+        "conclusion"
+      ],
+      "criteria": [
+        "problem_motivation_clarity",
+        "contribution_and_novelty",
+        "prior_work_and_positioning",
+        "claim_evidence_calibration"
+      ],
+      "criterion_definitions": [
+        {
+          "id": "problem_motivation_clarity",
+          "name": "Problem and motivation clarity",
+          "reviewer_question": "Is the problem clearly stated and convincingly motivated?",
+          "reviewer_guidance": "This combines problem clarity, motivation strength, and research objective clarity. A reviewer should understand what is being solved, why it matters, and what question the paper tries to answer.",
+          "score_descriptions": {
+            "0": "The problem/objective is unclear, or the motivation is generic and not tied to a concrete research gap.",
+            "1": "The problem and motivation are partially clear, but scope, objective, or importance remains vague.",
+            "2": "The paper clearly states the problem, explains why it matters, and defines a specific objective or research question."
+          },
+          "evidence_expectations": [
+            "Problem statement",
+            "Motivation or gap statement",
+            "Research question or objective"
+          ],
+          "missing_info_examples": [
+            "Specific research question",
+            "Concrete problem setting",
+            "Why the problem matters"
+          ],
+          "positive_example": "The paper identifies poor cross-domain NER generalization as the problem, explains why it matters for deployment, and states a concrete evaluation objective.",
+          "negative_example": "The paper says LLMs are important and many tasks are challenging but never defines the specific problem.",
+          "absorbed_from_previous_metrics": [
+            "problem_clarity",
+            "motivation_strength",
+            "research_question_clarity"
+          ],
+          "severity_guidance": {
+            "minor": "Motivation is somewhat generic but the problem is understandable.",
+            "major": "Problem scope or objective is unclear.",
+            "critical": "No identifiable problem or objective."
+          }
+        },
+        {
+          "id": "contribution_and_novelty",
+          "name": "Contribution and novelty",
+          "reviewer_question": "Are the paper's contributions concrete, and is novelty justified against close prior work?",
+          "reviewer_guidance": "A strong paper clearly states what is new: method, dataset, theorem, system, benchmark, analysis, or negative result. Novelty must be justified against nearest alternatives, not only broad fields.",
+          "score_descriptions": {
+            "0": "The contribution is unclear, generic, or novelty is unsupported.",
+            "1": "The contribution is stated, but novelty is weakly justified or compared only superficially to prior work.",
+            "2": "The contributions are concrete and novelty is justified through specific differences from close prior work."
+          },
+          "evidence_expectations": [
+            "Contribution list or equivalent claims",
+            "Comparison to close prior work",
+            "Technical or scientific distinction"
+          ],
+          "missing_info_examples": [
+            "What exactly is new",
+            "How it differs from closest alternatives"
+          ],
+          "positive_example": "The paper introduces a new objective, compares it to closest prompt-based NER methods, and isolates the new component in ablations.",
+          "negative_example": "The paper claims a novel framework but does not explain what is technically new.",
+          "absorbed_from_previous_metrics": [
+            "contribution_clarity",
+            "novelty_justification"
+          ],
+          "severity_guidance": {
+            "minor": "Contribution is clear but novelty is only partly justified.",
+            "major": "Novelty over close work is weakly supported.",
+            "critical": "No clear contribution or obvious duplication of prior work."
+          }
+        },
+        {
+          "id": "prior_work_and_positioning",
+          "name": "Prior work and positioning",
+          "reviewer_question": "Does the paper cover relevant prior work and clearly position itself relative to it?",
+          "reviewer_guidance": "The reviewer should be able to tell whether the paper extends, refutes, simplifies, corrects, or combines prior approaches. Missing close work should be penalized more than missing minor citations.",
+          "score_descriptions": {
+            "0": "Relevant prior work is absent, mostly irrelevant, or the paper's relationship to prior work is unclear.",
+            "1": "Some related work is discussed, but important close alternatives or precise positioning are missing.",
+            "2": "The paper covers major relevant work and clearly explains how it relates to specific prior approaches."
+          },
+          "evidence_expectations": [
+            "Related work coverage",
+            "Explicit positioning against close alternatives",
+            "Discussion of nearest baselines or approaches"
+          ],
+          "missing_info_examples": [
+            "Closest prior methods",
+            "Precise relationship to prior work",
+            "Why prior work is insufficient"
+          ],
+          "positive_example": "The paper explains how it differs from PromptNER-like methods and why those methods do not address the same failure mode.",
+          "negative_example": "The paper lists citations but never explains how the proposed method differs from them.",
+          "absorbed_from_previous_metrics": [
+            "related_work_coverage",
+            "positioning_against_prior_work",
+            "nearest_alternative_comparison"
+          ],
+          "severity_guidance": {
+            "minor": "Some relevant work or positioning is thin.",
+            "major": "Important close alternatives are missing.",
+            "critical": "Prior work is absent or misleading."
+          }
+        },
+        {
+          "id": "claim_evidence_calibration",
+          "name": "Claim-evidence calibration",
+          "reviewer_question": "Are the claims proportional to the actual evidence?",
+          "reviewer_guidance": "Penalize overgeneralization, causal claims from weak evidence, and conclusions broader than the evaluation. Reward careful scope and honest qualification.",
+          "score_descriptions": {
+            "0": "Major claims are unsupported or clearly stronger than the evidence.",
+            "1": "Most claims are partly supported, but some conclusions are overstated or insufficiently scoped.",
+            "2": "The main claims are supported by evidence and scoped to what was actually tested or proven."
+          },
+          "evidence_expectations": [
+            "Abstract and conclusion claims",
+            "Results or proofs supporting claims",
+            "Scope qualifiers and limitations"
+          ],
+          "missing_info_examples": [
+            "Evidence for strongest claims",
+            "Scope constraints",
+            "Connection between conclusion and experiments"
+          ],
+          "positive_example": "The authors claim improvement only on the tested domains and explicitly avoid claiming universal robustness.",
+          "negative_example": "The paper tests two English datasets but claims to solve multilingual generalization.",
+          "absorbed_from_previous_metrics": [
+            "claim_evidence_alignment",
+            "section_consistency"
+          ],
+          "severity_guidance": {
+            "minor": "Some wording is stronger than necessary.",
+            "major": "Several important claims exceed evidence.",
+            "critical": "Central claim is unsupported."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "D02_method_evidence_robustness",
+      "module_id": "distilled_scientific_validity",
+      "group_name": "Method, evidence, and robustness",
+      "group_review_focus": {
+        "what_to_inspect": "Inspect whether the method or argument is understandable, logically valid, supported by relevant evidence, and tested against alternatives or robustness checks.",
+        "what_not_to_do": "Do not produce a general review of the paper. Do not let one criterion's score influence another. Score each criterion independently using explicit evidence."
+      },
+      "recommended_source_sections": [
+        "method",
+        "approach",
+        "experiments",
+        "results",
+        "analysis",
+        "appendix"
+      ],
+      "criteria": [
+        "method_procedure_clarity",
+        "assumptions_and_logic",
+        "evidence_strength_and_relevance",
+        "alternatives_baselines_robustness"
+      ],
+      "criterion_definitions": [
+        {
+          "id": "method_procedure_clarity",
+          "name": "Method and procedure clarity",
+          "reviewer_question": "Can a reviewer understand what the authors actually did?",
+          "reviewer_guidance": "This includes method description, algorithm/pipeline, theoretical setup, experimental procedure, or survey protocol. The procedure should be detailed enough for critical assessment.",
+          "score_descriptions": {
+            "0": "The method or procedure is too vague to understand or audit.",
+            "1": "The high-level idea is understandable, but important steps, definitions, or operational details are missing.",
+            "2": "The method/procedure is described with enough detail for a reviewer to assess or replicate the core logic."
+          },
+          "evidence_expectations": [
+            "Method section",
+            "Algorithm/pseudocode/protocol",
+            "Definitions and operational steps"
+          ],
+          "missing_info_examples": [
+            "Algorithmic steps",
+            "Inputs/outputs",
+            "Procedure details",
+            "Definitions"
+          ],
+          "positive_example": "The paper gives pseudocode, model inputs/outputs, training objective, inference procedure, and evaluation protocol.",
+          "negative_example": "The paper says it uses an agentic pipeline but does not define the steps or decision rules.",
+          "absorbed_from_previous_metrics": [
+            "method_argument_clarity",
+            "procedure_detail"
+          ],
+          "severity_guidance": {
+            "minor": "Some details are unclear but core method is assessable.",
+            "major": "Important procedural steps are missing.",
+            "critical": "Cannot understand what was done."
+          }
+        },
+        {
+          "id": "assumptions_and_logic",
+          "name": "Assumptions and argument logic",
+          "reviewer_question": "Are the key assumptions stated, and do conclusions follow logically from the setup and results?",
+          "reviewer_guidance": "Look for hidden assumptions, internal contradictions, unsupported causal jumps, and whether the paper explains conditions under which its claims hold.",
+          "score_descriptions": {
+            "0": "Key assumptions are missing or conclusions do not follow from the premises, method, or results.",
+            "1": "The argument is mostly understandable, but some assumptions are implicit or important logical gaps remain.",
+            "2": "Key assumptions are explicit, and the reasoning from setup to conclusion is coherent and well scoped."
+          },
+          "evidence_expectations": [
+            "Assumptions",
+            "Logical chain from setup to conclusion",
+            "Scope conditions"
+          ],
+          "missing_info_examples": [
+            "Assumptions",
+            "Rationale for causal or mechanistic claims",
+            "Boundary conditions"
+          ],
+          "positive_example": "The paper states that label descriptions must be semantically informative and tests sensitivity to noisy descriptions.",
+          "negative_example": "The method assumes access to gold labels at inference time but never acknowledges this constraint.",
+          "absorbed_from_previous_metrics": [
+            "argument_logic",
+            "assumptions_discussion",
+            "claims_verifiability"
+          ],
+          "severity_guidance": {
+            "minor": "Some assumptions are implicit but not central.",
+            "major": "Important assumptions are hidden or weakly justified.",
+            "critical": "Core conclusion does not follow."
+          }
+        },
+        {
+          "id": "evidence_strength_and_relevance",
+          "name": "Evidence strength and relevance",
+          "reviewer_question": "Does the evidence directly and sufficiently support the main research question?",
+          "reviewer_guidance": "Evidence can be empirical, theoretical, qualitative, or analytical. Judge whether it tests the actual claim, not merely whether the paper contains many results.",
+          "score_descriptions": {
+            "0": "Evidence is absent, anecdotal, weak, or disconnected from the main question.",
+            "1": "Evidence is present but limited in scope, controls, scale, or relevance to key claims.",
+            "2": "Evidence directly addresses the main claims and is strong enough for the paper type."
+          },
+          "evidence_expectations": [
+            "Main evidence",
+            "Experiments/proofs/analysis",
+            "Connection to research question"
+          ],
+          "missing_info_examples": [
+            "Evidence for key claims",
+            "Evaluation aligned with stated objective",
+            "Sufficient scope"
+          ],
+          "positive_example": "A paper claiming cross-domain generalization evaluates on held-out domains and reports error analysis.",
+          "negative_example": "A paper claiming robustness evaluates only in-distribution accuracy.",
+          "absorbed_from_previous_metrics": [
+            "evidence_relevance",
+            "evidence_strength"
+          ],
+          "severity_guidance": {
+            "minor": "Evidence is relevant but somewhat limited.",
+            "major": "Evidence leaves important claims untested.",
+            "critical": "Evidence does not support the central claim."
+          }
+        },
+        {
+          "id": "alternatives_baselines_robustness",
+          "name": "Alternatives, baselines, and robustness",
+          "reviewer_question": "Does the paper test plausible alternatives, strong baselines, and robustness of conclusions?",
+          "reviewer_guidance": "For empirical work, this includes strong baselines, ablations, sensitivity analysis, and confound checks. For theory, counterexamples or assumption sensitivity. For surveys, competing taxonomies or inclusion sensitivity.",
+          "score_descriptions": {
+            "0": "No serious alternatives, baselines, ablations, or robustness checks are provided when they are relevant.",
+            "1": "Some alternatives or robustness checks are present, but they are weak, narrow, or omit obvious comparisons.",
+            "2": "The paper meaningfully tests alternatives and shows which conclusions are robust and which are conditional."
+          },
+          "evidence_expectations": [
+            "Baselines",
+            "Ablations",
+            "Robustness/sensitivity checks",
+            "Alternative explanations"
+          ],
+          "missing_info_examples": [
+            "Strong baselines",
+            "Ablation of key components",
+            "Sensitivity to settings",
+            "Confound checks"
+          ],
+          "positive_example": "The paper compares to strong baselines, includes parameter-matched controls, and ablates each main component.",
+          "negative_example": "The paper attributes gains to a new module without comparing to a parameter-matched baseline.",
+          "absorbed_from_previous_metrics": [
+            "alternative_explanations_or_baselines",
+            "robustness_sensitivity_ablation",
+            "nearest_alternative_comparison"
+          ],
+          "severity_guidance": {
+            "minor": "Robustness is present but limited.",
+            "major": "Obvious baselines or ablations are missing.",
+            "critical": "No meaningful comparison supports the main improvement."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "D03_interpretation_limitations_discussion",
+      "module_id": "distilled_discussion_quality",
+      "group_name": "Interpretation, limitations, and discussion",
+      "group_review_focus": {
+        "what_to_inspect": "Inspect whether the paper explains why results occur, handles unexpected findings, honestly states limitations, and proposes meaningful future work.",
+        "what_not_to_do": "Do not produce a general review of the paper. Do not let one criterion's score influence another. Score each criterion independently using explicit evidence."
+      },
+      "recommended_source_sections": [
+        "results",
+        "analysis",
+        "discussion",
+        "limitations",
+        "future work",
+        "conclusion"
+      ],
+      "criteria": [
+        "mechanistic_interpretation",
+        "anomalies_and_error_analysis",
+        "limitations_quality",
+        "future_work_actionability"
+      ],
+      "criterion_definitions": [
+        {
+          "id": "mechanistic_interpretation",
+          "name": "Mechanistic interpretation of results",
+          "reviewer_question": "Do the authors explain why the observed results occur?",
+          "reviewer_guidance": "A strong discussion identifies a mechanism and supports it with analysis, ablations, theory, or qualitative evidence. Restating tables is not enough.",
+          "score_descriptions": {
+            "0": "The paper reports results without explaining why they occur.",
+            "1": "The paper gives a plausible but generic or weakly supported interpretation.",
+            "2": "The paper provides a concrete mechanism or interpretation supported by evidence or analysis."
+          },
+          "evidence_expectations": [
+            "Result interpretation",
+            "Mechanism",
+            "Supporting analysis or ablation"
+          ],
+          "missing_info_examples": [
+            "Mechanism",
+            "Evidence for mechanism",
+            "Error/category analysis"
+          ],
+          "positive_example": "The authors show gains concentrate on rare entities and connect this to the label-description module through an ablation.",
+          "negative_example": "The paper says the model performs better because it learns better representations without analysis.",
+          "absorbed_from_previous_metrics": [
+            "result_interpretation_mechanism"
+          ],
+          "severity_guidance": {
+            "minor": "Interpretation is plausible but thin.",
+            "major": "Mechanism is asserted without support.",
+            "critical": "No explanation for central results."
+          }
+        },
+        {
+          "id": "anomalies_and_error_analysis",
+          "name": "Anomalies and error analysis",
+          "reviewer_question": "Does the paper acknowledge and analyze surprising, inconsistent, or failure-case results?",
+          "reviewer_guidance": "Unexpected results, dataset-specific failures, or visible table anomalies should be discussed. If no anomaly is visible, the paper should still provide enough analysis to understand failure modes.",
+          "score_descriptions": {
+            "0": "Unexpected results or important failure modes are ignored, or there is no meaningful error analysis.",
+            "1": "Anomalies or errors are acknowledged, but explanations are speculative or shallow.",
+            "2": "Unexpected results and important failure modes are explained with plausible evidence, examples, or analysis."
+          },
+          "evidence_expectations": [
+            "Unexpected results",
+            "Failure cases",
+            "Error analysis",
+            "Dataset-specific anomalies"
+          ],
+          "missing_info_examples": [
+            "Failure mode analysis",
+            "Explanation of outliers",
+            "Examples of errors"
+          ],
+          "positive_example": "A dataset-specific drop is traced to domain-specific entity ambiguity and supported with error categories.",
+          "negative_example": "One dataset shows a large performance drop, but the discussion ignores it.",
+          "absorbed_from_previous_metrics": [
+            "anomaly_explanation",
+            "alternative_explanations_discussion"
+          ],
+          "severity_guidance": {
+            "minor": "Failure analysis is limited.",
+            "major": "Important anomaly is weakly explained.",
+            "critical": "Major contradiction or failure is ignored."
+          }
+        },
+        {
+          "id": "limitations_quality",
+          "name": "Limitations quality",
+          "reviewer_question": "Are the limitations honest, specific, and focused on the main weaknesses?",
+          "reviewer_guidance": "A useful limitation states what is limited, why it matters, and where it applies. Penalize safe but minor limitations that avoid the main threats to validity.",
+          "score_descriptions": {
+            "0": "Limitations are absent, cosmetic, or ignore major weaknesses.",
+            "1": "Some limitations are stated, but they are generic, incomplete, or miss important threats.",
+            "2": "Limitations are concrete, honest, and explain what is limited, why it matters, and the scope of applicability."
+          },
+          "evidence_expectations": [
+            "Limitations section",
+            "Threats to validity",
+            "Scope constraints"
+          ],
+          "missing_info_examples": [
+            "WHAT is limited",
+            "MECHANISM of limitation",
+            "SCOPE of applicability"
+          ],
+          "positive_example": "The authors explain that evaluation only on English newswire limits claims about biomedical or multilingual transfer.",
+          "negative_example": "A paper with no strong baselines lists only compute cost as a limitation.",
+          "absorbed_from_previous_metrics": [
+            "limitations_presence",
+            "limitations_what_mechanism_scope",
+            "limitations_cover_main_weaknesses"
+          ],
+          "severity_guidance": {
+            "minor": "Limitations are concrete but incomplete.",
+            "major": "Main weakness is missing.",
+            "critical": "Limitations conceal a central validity problem."
+          }
+        },
+        {
+          "id": "future_work_actionability",
+          "name": "Future work actionability",
+          "reviewer_question": "Does future work follow from limitations and specify actionable next steps?",
+          "reviewer_guidance": "Good future work should not be a generic wishlist. It should name what to test/build, why, and in which setting.",
+          "score_descriptions": {
+            "0": "Future work is absent, generic, or unrelated to the paper's limitations.",
+            "1": "Future work names a direction but lacks a concrete action, hypothesis, or target setting.",
+            "2": "Future work follows from specific limitations and states actionable next steps with a clear target or hypothesis."
+          },
+          "evidence_expectations": [
+            "Future work section",
+            "Connection to limitations",
+            "Concrete next experiments or hypotheses"
+          ],
+          "missing_info_examples": [
+            "Concrete action",
+            "Hypothesis",
+            "Target model/data/domain",
+            "Expected outcomes"
+          ],
+          "positive_example": "After noting weak multilingual evidence, the authors propose testing on specific multilingual benchmarks with a stated hypothesis.",
+          "negative_example": "The paper ends with 'we will try more models and datasets' without linking this to any limitation.",
+          "absorbed_from_previous_metrics": [
+            "future_work_from_limitations",
+            "future_work_specificity"
+          ],
+          "severity_guidance": {
+            "minor": "Future work is somewhat generic.",
+            "major": "Future work is disconnected from limitations.",
+            "critical": "No meaningful future work despite unresolved central weaknesses."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "D04_reproducibility_artifacts",
+      "module_id": "distilled_reproducibility",
+      "group_name": "Reproducibility, data, setup, and artifacts",
+      "group_review_focus": {
+        "what_to_inspect": "Inspect whether the data, processing, system configuration, code, artifacts, and reproduction path are specific enough for independent verification.",
+        "what_not_to_do": "Do not produce a general review of the paper. Do not let one criterion's score influence another. Score each criterion independently using explicit evidence."
+      },
+      "recommended_source_sections": [
+        "dataset",
+        "experimental setup",
+        "implementation details",
+        "appendix",
+        "artifact availability",
+        "repository"
+      ],
+      "criteria": [
+        "data_specification_and_access",
+        "data_processing_and_leakage_control",
+        "model_system_configuration",
+        "code_artifacts_and_reproduction_budget"
+      ],
+      "criterion_definitions": [
+        {
+          "id": "data_specification_and_access",
+          "name": "Data specification and access",
+          "reviewer_question": "Can the reviewer identify, inspect, and potentially access the data or source material?",
+          "reviewer_guidance": "This combines dataset/source name, version/date, exact counts or split sizes, and public/access availability. For surveys, include search hits and inclusion counts.",
+          "score_descriptions": {
+            "0": "Data/source identity, counts, or access path are missing or too vague.",
+            "1": "Data/source is partially specified, but version, counts, splits, or access details are incomplete.",
+            "2": "Data/source is identified with version/date/access path and key counts or splits are reported."
+          },
+          "evidence_expectations": [
+            "Dataset/source name",
+            "Version/date/access path",
+            "Counts/splits/cohort size"
+          ],
+          "missing_info_examples": [
+            "Dataset version",
+            "Split counts",
+            "Access link",
+            "Collection date"
+          ],
+          "positive_example": "The paper reports dataset version, access link, filtering date, and exact train/validation/test counts.",
+          "negative_example": "The paper says it uses a public dataset but does not name it or report split sizes.",
+          "absorbed_from_previous_metrics": [
+            "ml_dataset_name_version_link",
+            "ml_train_val_test_exact_split",
+            "ml_public_data_availability",
+            "data_name_version_link",
+            "data_composition_exact_numbers",
+            "public_data_availability"
+          ],
+          "severity_guidance": {
+            "minor": "Data is identifiable but some counts are missing.",
+            "major": "Data access or splits are unclear.",
+            "critical": "Data source cannot be identified."
+          }
+        },
+        {
+          "id": "data_processing_and_leakage_control",
+          "name": "Data processing and leakage control",
+          "reviewer_question": "Are preprocessing decisions specified and is evaluation protected from leakage or circularity?",
+          "reviewer_guidance": "This includes cleaning, filtering, augmentation, deduplication, split construction, contamination checks, and separation of training/tuning/final evaluation.",
+          "score_descriptions": {
+            "0": "Processing is missing or there is clear/high risk of leakage, contamination, circularity, or test-set tuning.",
+            "1": "Processing is partially described, but leakage controls or key parameters are unclear.",
+            "2": "Processing is operationally specified and the evaluation design clearly controls leakage/circularity risk."
+          },
+          "evidence_expectations": [
+            "Preprocessing",
+            "Filtering",
+            "Augmentation",
+            "Deduplication",
+            "Leakage checks"
+          ],
+          "missing_info_examples": [
+            "Filtering thresholds",
+            "Deduplication rule",
+            "Split construction",
+            "Contamination check",
+            "Tuning protocol"
+          ],
+          "positive_example": "The paper reports deduplication, filtering thresholds, augmentation settings, and confirms the test set was not used for model selection.",
+          "negative_example": "Hyperparameters are selected on final test performance, or data cleaning is described only as 'we cleaned the data'.",
+          "absorbed_from_previous_metrics": [
+            "ml_preprocessing_augmentation_parameters",
+            "ml_test_leakage_risk",
+            "data_processing_parameters",
+            "leakage_circularity_risk"
+          ],
+          "severity_guidance": {
+            "minor": "Some processing details are missing.",
+            "major": "Leakage controls are unclear.",
+            "critical": "High risk or evidence of leakage."
+          }
+        },
+        {
+          "id": "model_system_configuration",
+          "name": "Model/system configuration and parameter selection",
+          "reviewer_question": "Is the exact model/system/method configuration and parameter selection process reproducible?",
+          "reviewer_guidance": "For ML this includes architecture/checkpoint, hyperparameters, search ranges, validation metric, seeds, and environment. For non-ML systems, include tool versions, protocol settings, and result-affecting parameters.",
+          "score_descriptions": {
+            "0": "The model/system configuration or parameter selection is too vague to reproduce.",
+            "1": "Some configuration details are reported, but important parameters, search process, seeds, or environment details are missing.",
+            "2": "The exact system/model, key parameters, selection process, randomness controls, and environment are specified enough for reproduction."
+          },
+          "evidence_expectations": [
+            "Architecture/checkpoint/tool version",
+            "Hyperparameters",
+            "Search process",
+            "Seeds",
+            "Environment"
+          ],
+          "missing_info_examples": [
+            "Checkpoint/version",
+            "Hyperparameters",
+            "Search ranges",
+            "Selection rule",
+            "Seeds",
+            "Hardware/software versions"
+          ],
+          "positive_example": "The paper gives checkpoint revision, optimizer, LR, batch size, epochs, search ranges, validation metric, seed policy, GPU, and library versions.",
+          "negative_example": "The paper says it fine-tunes BERT with default settings and gives no checkpoint or tuning details.",
+          "absorbed_from_previous_metrics": [
+            "ml_exact_architecture_or_checkpoint",
+            "ml_hyperparameters_complete",
+            "ml_hyperparameter_search",
+            "ml_random_seed_nondeterminism",
+            "ml_compute_environment",
+            "exact_system_model_method",
+            "result_affecting_parameters",
+            "parameter_selection_process",
+            "randomness_and_instability",
+            "execution_environment"
+          ],
+          "severity_guidance": {
+            "minor": "A few configuration details are missing.",
+            "major": "Important reproduction settings are missing.",
+            "critical": "Setup cannot be reproduced."
+          }
+        },
+        {
+          "id": "code_artifacts_and_reproduction_budget",
+          "name": "Code, artifacts, and reproduction budget",
+          "reviewer_question": "Are code, artifacts, and reproduction instructions sufficient for a realistic independent check?",
+          "reviewer_guidance": "Consider code, dependencies, run commands, checkpoints, configs, logs, processed data, prompts, and whether reproduction is feasible for the target research community.",
+          "score_descriptions": {
+            "0": "No usable code/artifacts are available, or reproduction is practically impossible without hidden resources.",
+            "1": "Some code/artifacts are available, but instructions, dependencies, checkpoints, or reproduction path are incomplete.",
+            "2": "The paper provides key artifacts and a feasible reproduction path with reasonable resources or a justified scalable proxy."
+          },
+          "evidence_expectations": [
+            "Code repository",
+            "Run instructions",
+            "Artifacts",
+            "Compute/resource requirements"
+          ],
+          "missing_info_examples": [
+            "Dependencies",
+            "Commands",
+            "Checkpoints",
+            "Configs",
+            "Logs",
+            "Reproduction budget"
+          ],
+          "positive_example": "The repository includes environment files, data scripts, training/evaluation commands, checkpoints, configs, and logs.",
+          "negative_example": "Only a PDF is available, or the repository contains notebooks with hard-coded local paths and no instructions.",
+          "absorbed_from_previous_metrics": [
+            "ml_code_run_instructions",
+            "ml_reproducible_budget",
+            "ml_published_checkpoints_artifacts",
+            "materials_availability",
+            "reasonable_reproducibility_budget",
+            "code_and_run_instructions",
+            "reproducible_with_reasonable_budget",
+            "key_artifacts_published"
+          ],
+          "severity_guidance": {
+            "minor": "Artifacts are mostly available but incomplete.",
+            "major": "Reproduction path has serious gaps.",
+            "critical": "No meaningful independent check is possible."
+          }
+        }
+      ]
+    },
+    {
+      "group_id": "D05_statistics_llm_and_writing",
+      "module_id": "distilled_evaluation_reliability",
+      "group_name": "Statistics, LLM-specific reliability, and evaluation protocol",
+      "group_review_focus": {
+        "what_to_inspect": "Inspect whether metrics are precisely defined, uncertainty and significance are handled, effect sizes are meaningful, and LLM-specific setup is reproducible when relevant.",
+        "what_not_to_do": "Do not produce a general review of the paper. Do not let one criterion's score influence another. Score each criterion independently using explicit evidence."
+      },
+      "recommended_source_sections": [
+        "metrics",
+        "results",
+        "statistical analysis",
+        "LLM setup",
+        "prompts",
+        "appendix"
+      ],
+      "criteria": [
+        "metric_definition_and_evaluation_protocol",
+        "uncertainty_significance_and_comparison_control",
+        "effect_size_and_practical_significance",
+        "llm_setup_and_judge_reliability"
+      ],
+      "criterion_definitions": [
+        {
+          "id": "metric_definition_and_evaluation_protocol",
+          "name": "Metric definition and evaluation protocol",
+          "reviewer_question": "Are evaluation metrics and protocols precisely defined?",
+          "reviewer_guidance": "A metric name is often ambiguous. Look for formula, implementation, averaging scheme, thresholds, annotation rules, evaluation scripts, and primary metric selection.",
+          "score_descriptions": {
+            "0": "Metrics or evaluation protocol are named but not operationally defined.",
+            "1": "Metrics are partially described, but important implementation or protocol details are ambiguous.",
+            "2": "Metrics and evaluation protocol are defined precisely enough to reproduce or audit the results."
+          },
+          "evidence_expectations": [
+            "Metric definitions",
+            "Evaluation protocol",
+            "Primary metric",
+            "Implementation details"
+          ],
+          "missing_info_examples": [
+            "Metric formula",
+            "Averaging scheme",
+            "Evaluation script",
+            "Thresholds",
+            "Primary metric"
+          ],
+          "positive_example": "The paper specifies entity-level macro-F1 using sklearn with labels excluding 'O' and provides the evaluation script.",
+          "negative_example": "The paper reports F1 without specifying macro/micro/span/entity-level.",
+          "absorbed_from_previous_metrics": [
+            "ml_metric_formula_implementation",
+            "metric_formula_or_implementation"
+          ],
+          "severity_guidance": {
+            "minor": "Metric is mostly clear but some implementation details are missing.",
+            "major": "Metric ambiguity affects interpretation.",
+            "critical": "Evaluation cannot be interpreted."
+          }
+        },
+        {
+          "id": "uncertainty_significance_and_comparison_control",
+          "name": "Uncertainty, significance, and comparison control",
+          "reviewer_question": "Does the paper report uncertainty and control comparison reliability?",
+          "reviewer_guidance": "This compresses repeated runs, confidence intervals, statistical tests, multiple comparisons, and exploratory/confirmatory separation.",
+          "score_descriptions": {
+            "0": "Results are based on single or unclear estimates, with no uncertainty, test, or comparison control where needed.",
+            "1": "Some uncertainty or testing is reported, but it is incomplete, weakly justified, or misses multiple-comparison/exploratory risks.",
+            "2": "The paper reports appropriate uncertainty and uses suitable tests, corrections, held-out protocols, or safeguards for comparisons."
+          },
+          "evidence_expectations": [
+            "Number of runs",
+            "Variance/CI",
+            "Statistical tests",
+            "Multiple-comparison handling",
+            "Exploratory/confirmatory split"
+          ],
+          "missing_info_examples": [
+            "Number of runs",
+            "Mean±std/CI",
+            "Test choice",
+            "Correction method",
+            "Primary metric protocol"
+          ],
+          "positive_example": "The paper reports five seeds with mean±std, paired bootstrap tests, and a predefined primary metric.",
+          "negative_example": "The paper reports the best result across many prompts, metrics, and datasets without variance, disclosure, or correction.",
+          "absorbed_from_previous_metrics": [
+            "ml_multiple_runs_std_ci",
+            "ml_statistical_test",
+            "ml_multiple_comparison_corrections",
+            "ml_exploratory_confirmatory_split",
+            "multiple_runs_variance_ci",
+            "statistical_test",
+            "multiple_comparisons_control",
+            "exploratory_confirmatory_split"
+          ],
+          "severity_guidance": {
+            "minor": "Uncertainty is reported but incomplete.",
+            "major": "Comparison reliability is weak.",
+            "critical": "Main comparison is statistically unreliable."
+          }
+        },
+        {
+          "id": "effect_size_and_practical_significance",
+          "name": "Effect size and practical significance",
+          "reviewer_question": "Is the magnitude of improvement interpretable and practically meaningful?",
+          "reviewer_guidance": "Look for absolute improvements, confidence intervals, cost/benefit, error reduction, benchmark relevance, and whether sample size is sufficient for the claimed effect.",
+          "score_descriptions": {
+            "0": "Effect size or sample adequacy is missing, or only relative gains/p-values are reported.",
+            "1": "Effect size can be inferred, but practical significance or sample adequacy is weakly discussed.",
+            "2": "Absolute effect size, practical meaning, and evaluation sample adequacy are clearly reported or justified."
+          },
+          "evidence_expectations": [
+            "Absolute effect size",
+            "Practical meaning",
+            "Sample size or benchmark adequacy"
+          ],
+          "missing_info_examples": [
+            "Absolute improvement",
+            "Baseline value",
+            "Confidence interval",
+            "Sample-size justification",
+            "Practical impact"
+          ],
+          "positive_example": "The paper reports +2.1 macro-F1, 95% CI, error reduction, and explains why the benchmark can detect this effect.",
+          "negative_example": "The paper reports '20% improvement' without baseline value, absolute difference, or sample-size justification.",
+          "absorbed_from_previous_metrics": [
+            "ml_effect_size",
+            "ml_test_set_size_justification",
+            "effect_size",
+            "test_sample_size_justification"
+          ],
+          "severity_guidance": {
+            "minor": "Effect size is visible but weakly interpreted.",
+            "major": "Practical significance is unclear.",
+            "critical": "Claimed improvement may be meaningless or unsupported."
+          }
+        },
+        {
+          "id": "llm_setup_and_judge_reliability",
+          "name": "LLM setup and judge reliability",
+          "reviewer_question": "If LLMs or LLM-as-a-judge are used, is the setup reproducible and is judge reliability tested?",
+          "reviewer_guidance": "For LLM papers, check exact model/version, decoding parameters, prompts, structured output parsing, judge stability, and bias/sensitivity. If the paper clearly does not use LLMs, score 2.",
+          "score_descriptions": {
+            "0": "The paper uses LLMs/LLM judges but omits model details, prompts, parsing, stability checks, or bias controls.",
+            "1": "Some LLM setup details or judge checks are provided, but important reproducibility or reliability details are missing.",
+            "2": "The paper reports exact LLM setup, prompts, parsing/validation, and judge stability/bias checks; or the paper clearly does not use LLMs."
+          },
+          "evidence_expectations": [
+            "LLM model/version",
+            "Decoding parameters",
+            "Prompts",
+            "Parsing/validation",
+            "Judge stability",
+            "Bias/sensitivity checks"
+          ],
+          "missing_info_examples": [
+            "Model ID",
+            "API date",
+            "Temperature/top_p/max_tokens",
+            "Prompts",
+            "Schema",
+            "Retries",
+            "Agreement analysis",
+            "Bias tests"
+          ],
+          "positive_example": "The appendix lists model ID, date, temperature, prompts, JSON schema, retry policy, agreement with humans, and order-bias tests.",
+          "negative_example": "The paper says 'we used ChatGPT as a judge' without prompts, settings, agreement analysis, or bias checks.",
+          "absorbed_from_previous_metrics": [
+            "llm_exact_model_version",
+            "llm_decoding_parameters",
+            "llm_prompts_verbatim",
+            "llm_structured_output_parsing_validation",
+            "llm_judge_stability",
+            "llm_judge_bias_sensitivity",
+            "llm_prompts_templates_policies_verbatim"
+          ],
+          "severity_guidance": {
+            "minor": "LLM setup is mostly clear but one detail is missing.",
+            "major": "Important LLM reproducibility or judge reliability checks are missing.",
+            "critical": "LLM judge or LLM pipeline is central but not auditable."
+          }
+        }
+      ]
+    }
+  ],
+  "recommended_calling_strategy": {
+    "default": [
+      "D01_framing_positioning_claims",
+      "D02_method_evidence_robustness",
+      "D03_interpretation_limitations_discussion",
+      "D04_reproducibility_artifacts",
+      "D05_statistics_llm_and_writing"
+    ],
+    "estimated_calls": 5,
+    "estimated_metrics_per_review": 20,
+    "recommended_for": [
+      "ml_paper",
+      "llm_paper",
+      "non_ml_empirical_paper",
+      "systems_paper",
+      "theoretical_paper",
+      "survey_paper"
+    ],
+    "note": "Run all five groups for most scientific papers. The criteria are broad enough to cover ML, LLM, empirical, systems, theoretical, and survey papers."
+  },
+  "pydantic_model_hint": {
+    "CriterionScore": {
+      "criterion_id": "str",
+      "score": "Literal[0, 1, 2]",
+      "evidence": "str",
+      "comment": "str",
+      "missing_info": "list[str]",
+      "severity": "Literal['none', 'minor', 'major', 'critical']",
+      "confidence": "Literal['low', 'medium', 'high']"
+    },
+    "GroupResult": {
+      "group_id": "str",
+      "group_name": "str",
+      "criterion_results": "list[CriterionScore]",
+      "group_summary": "str"
+    },
+    "validation_rule": "The set of criterion_id values in criterion_results must exactly match the criteria list of the evaluated group."
+  },
+  "group_prompt_template": "You are evaluating a scientific paper as a careful conference reviewer.\n\nEvaluate ONLY the current rubric group.\n\nGroup ID: {group_id}\nGroup name: {group_name}\nGroup focus: {group_focus}\n\nScoring scale:\n0 = absent, poor, unsupported, or missing despite being relevant.\n1 = partial, unclear, incomplete, or insufficiently supported.\n2 = good, sufficient, concrete, and well supported.\n\nRules:\n- Return exactly one result for each criterion_id listed below.\n- Do not add extra criteria.\n- Do not output an overall group score.\n- Do not make an accept/reject recommendation.\n- Score each criterion independently.\n- Do not infer missing details.\n- Use concrete evidence from the paper; cite section/table/figure/appendix when possible.\n- Every criterion must be scored with 0, 1, or 2.\n\nCriteria:\n{criteria_json}\n\nPaper context:\n{paper_context}\n\nReturn valid JSON matching the group output schema.\n"
+}

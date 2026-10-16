@@ -1,0 +1,7 @@
+pyspellchecker>=0.8
+language-tool-python>=2.8
+pylatexenc>=2.10
+pypdf>=6.0
+pytest>=8.0
+nbformat>=5.0
+jupyter>=1.0

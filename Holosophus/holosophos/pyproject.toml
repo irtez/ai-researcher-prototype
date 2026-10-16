@@ -1,0 +1,86 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "holosophos"
+version = "1.0.0"
+description = "Holosophos Project"
+requires-python = ">=3.12"
+dependencies = [
+    "pyyaml>=5.3.1",
+    "types-pyyaml>=5.3.1",
+    "docker>=7.1.0",
+    "fire>=0.7.0",
+    "tqdm>=4.66.0",
+    "types-tqdm>=4.66.0",
+    "gradio==5.29.0",
+    "academia-mcp==1.11.1",
+    "mle-kit-mcp==1.2.3",
+    "mcp>=1.10.1",
+    "codearkt==1.8.20",
+    "langfuse>=2.59.7,<3",
+    "pydantic-settings>=2.6.1",
+    "pymupdf>=1.27.1",
+    "python-multipart>=0.0.22",
+    "websockets>=15,<16",
+]
+
+[dependency-groups]
+dev = [
+    "black==25.1.0",
+    "mypy==1.16.0",
+    "flake8==7.2.0",
+    "pytest>=8.4.1",
+    "pytest-asyncio>=1.1.0",
+    "datasets>=4.5.0",
+    "huggingface-hub>=1.4.1",
+    "duckduckgo-search>=8.1.1",
+    "ddgs>=9.12.0",
+    "scholarly>=1.7.11",
+]
+
+[tool.setuptools]
+py-modules = ["research_paper_registry"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["holosophos*"]
+
+[tool.flake8]
+exclude = ["*/__init__.py"]
+ignore = "E203,F403,E501,SIM115,PIE786,W503,E226"
+max-line-length = 120
+
+[tool.mypy]
+python_version = "3.12"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+strict = true
+explicit_package_bases = true
+
+[[tool.mypy.overrides]]
+module = "*"
+ignore_missing_imports = true
+follow_imports = "skip"
+
+[tool.setuptools.package-data]
+"holosophos" = [
+    "prompts/*.yaml",
+    "skills/**/*.yaml",
+    "skills/**/*.md",
+    "tools/writer/*.json",
+]
+
+[[tool.mypy.overrides]]
+module = "pydantic.*"
+follow_imports = "skip"
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+asyncio_default_test_loop_scope = "function"
+testpaths = [
+    "tests"
+]

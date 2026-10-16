@@ -1,0 +1,28 @@
+/paperbanana/
+workdir/.mle_locks/
+/.playwright-mcp/
+/.venv/
+/.tmp/
+/data/chemistry/
+
+# Separate private repo: github.com/AlekseiSDev/AITH_vkr
+/diploma/
+
+# .claude/ is a per-developer LOCAL harness — kept on disk for personal use,
+# NOT tracked. Covers skills, dev-* agents, workflows, settings.json, and the
+# generated agents/*.md. (Untracked 2026-07; docs still reference these paths.)
+/.claude/
+
+# Never commit private keys (e.g. cloud.ru SSH keys staged in docs/ by accident).
+**/*private_key*
+**/id_rsa
+**/sber_id_rsa
+
+# Basic-auth login/password list for the authenticated deploy overlay
+# (docker-compose.auth.yml). The .example is committed; the real file is not.
+/docker/.htpasswd
+
+# Local console identities and exported research artifacts.
+.console-state/
+console-downloads/
+.console-smoke/

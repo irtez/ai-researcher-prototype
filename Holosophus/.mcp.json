@@ -1,0 +1,24 @@
+{
+  "mcpServers": {
+    "alphaxiv": {
+      "type": "http",
+      "url": "https://api.alphaxiv.org/mcp/v1"
+    },
+    "academia": {
+      "type": "http",
+      "url": "http://localhost:5056/mcp"
+    },
+    "mle_kit": {
+      "type": "http",
+      "url": "http://localhost:5057/mcp"
+    },
+    "paperbanana": {
+      "type": "http",
+      "url": "http://localhost:5060/mcp"
+    },
+    "writer_tools": {
+      "type": "http",
+      "url": "http://localhost:5059/mcp"
+    }
+  }
+}

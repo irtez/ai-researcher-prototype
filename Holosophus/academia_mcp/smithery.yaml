@@ -1,0 +1,15 @@
+runtime: "container"
+build:
+  dockerfile: "Dockerfile"
+  dockerBuildPath: "."
+startCommand:
+  type: "http"
+  command: ["python", "-m", "academia_mcp", "--transport", "streamable-http", "--host", "0.0.0.0"]
+  configSchema:
+    type: "object"
+    properties: {}
+    required: []
+  exampleConfig: {}
+env:
+  ENABLE_AUTH: "false"
+  FASTMCP_AUTH: ""

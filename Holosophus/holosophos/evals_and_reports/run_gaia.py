@@ -1,0 +1,245 @@
+import shutil
+import logging
+import re
+import string
+from pathlib import Path
+from typing import Optional, Any
+
+import fire  # type: ignore
+import pandas as pd  # type: ignore
+import yaml  # type: ignore
+from datasets import load_dataset  # type: ignore
+from huggingface_hub import hf_hub_download  # type: ignore
+from codearkt.server import run_batch
+
+from reports.observability import (
+    benchmark_observability_context,
+    make_workspace_session_ids,
+    setup_observability,
+)
+from holosophos.utils import render_prompt
+from holosophos.main_agent import compose_main_agent, MCP_CONFIG
+from holosophos.settings import settings
+
+
+QUESTION_PROMPT = """You have one question to answer. It is paramount that you provide a correct answer.
+Give it all you can: I know for a fact that you have access to all the relevant tools to solve it
+and find the exact correct answer (the answer does exist).
+Failure or 'I cannot answer' or 'None found' will not be tolerated, success will be rewarded.
+Run verification steps if that's needed, you must make sure you find the correct answer!
+
+Here is the question:
+===
+{{question}}
+===
+
+{% if attached_files %}Attached files (copied to the workspace):
+{{attached_files}}{% endif %}
+
+Return only the answer after the 'Final answer:'.
+Don't provide any explanations after the 'Final answer:' line.
+Answer the given question exactly as requested, read the question carefully.
+For instance if are asked "how many thousand hours..." and the answer is 2000 hours, return "2" not "2000".
+Don't include measurement units (like m³ or Å or %) in a numerical final answer.
+"""
+
+
+CONFIG_PATH = Path(__file__).with_name("config.yaml")
+
+
+def _load_gaia_config() -> dict[str, Any]:
+    if not CONFIG_PATH.exists():
+        return {}
+    payload = yaml.safe_load(CONFIG_PATH.read_text(encoding="utf-8"))
+    if not isinstance(payload, dict):
+        return {}
+    section = payload.get("gaia", {})
+    if not isinstance(section, dict):
+        return {}
+    return dict(section)
+
+
+def _normalize_number_str(number_str: str) -> float:
+    for char in ["$", "%", ","]:
+        number_str = number_str.replace(char, "")
+    try:
+        return float(number_str)
+    except ValueError:
+        return float("inf")
+
+
+def _split_string(
+    s: str,
+    char_list: list[str] = [",", ";"],
+) -> list[str]:
+    pattern = f"[{''.join(char_list)}]"
+    return re.split(pattern, s)
+
+
+def _normalize_str(input_str: str, remove_punct: bool = True) -> str:
+    no_spaces = re.sub(r"\s", "", input_str)
+    if remove_punct:
+        translator = str.maketrans("", "", string.punctuation)
+        return no_spaces.lower().translate(translator)
+    else:
+        return no_spaces.lower()
+
+
+def _answer_scorer(
+    model_answer: Optional[str],
+    ground_truth: str,
+) -> bool:
+    def is_float(element: Any) -> bool:
+        try:
+            float(element)
+            return True
+        except ValueError:
+            return False
+
+    if model_answer is None:
+        model_answer = "None"
+
+    if is_float(ground_truth):
+        normalized_answer = _normalize_number_str(model_answer)
+        return normalized_answer == float(ground_truth)
+
+    elif any(char in ground_truth for char in [",", ";"]):
+        gt_elems = _split_string(ground_truth)
+        ma_elems = _split_string(model_answer)
+
+        if len(gt_elems) != len(ma_elems):
+            return False
+
+        comparisons = []
+        for ma_elem, gt_elem in zip(ma_elems, gt_elems):
+            if is_float(gt_elem):
+                normalized_ma_elem = _normalize_number_str(ma_elem)
+                comparisons.append(normalized_ma_elem == float(gt_elem))
+            else:
+                comparisons.append(
+                    _normalize_str(ma_elem, remove_punct=False)
+                    == _normalize_str(gt_elem, remove_punct=False)
+                )
+        return all(comparisons)
+
+    else:
+        return _normalize_str(model_answer) == _normalize_str(ground_truth)
+
+
+def _get_final_answer(text: str) -> str:
+    if "Final answer:**" in text:
+        return text.split("Final answer:**")[-1].strip()
+    if "Final answer:" in text:
+        return text.split("Final answer:")[-1].strip()
+    return text.strip()
+
+
+async def run_gaia(
+    split: str = "validation",
+    model_name: str = "",
+    max_workers: int = 1,
+    verbosity_level: int = logging.INFO,
+    start_index: int = 0,
+    nrows: Optional[int] = None,
+    enable_phoenix: bool = False,
+    enable_langfuse: bool = False,
+    langfuse_session_id: str = "",
+    phoenix_project_name: str = settings.PHOENIX_PROJECT_NAME,
+    phoenix_endpoint: str = settings.RESOLVED_PHOENIX_ENDPOINT,
+    predictions_path: str = "predictions.jsonl",
+    files_only: bool = False,
+    max_completion_tokens: int = settings.MAX_COMPLETION_TOKENS,
+    max_history_tokens: int = settings.MAX_HISTORY_TOKENS,
+) -> None:
+    report_config = _load_gaia_config()
+    model_name = model_name or settings.MODEL_NAME
+    if nrows is None and report_config.get("nrows") is not None:
+        nrows = int(report_config["nrows"])
+
+    setup_observability(
+        enable_phoenix=enable_phoenix,
+        phoenix_project_name=phoenix_project_name,
+        phoenix_endpoint=phoenix_endpoint,
+        enable_langfuse=enable_langfuse,
+    )
+
+    eval_ds = load_dataset("gaia-benchmark/GAIA", "2023_all")[split]
+    eval_ds = eval_ds.rename_columns(
+        {"Question": "question", "Final answer": "true_answer", "Level": "task"}
+    )
+    eval_df = pd.DataFrame(eval_ds)
+    tasks_to_run = eval_df.to_dict(orient="records")
+    tasks_to_run = tasks_to_run[start_index:]
+    selected_examples = []
+    for example in tasks_to_run[:nrows]:
+        if files_only and not example["file_path"]:
+            continue
+        selected_examples.append(example)
+
+    agent = compose_main_agent(
+        model_name=model_name,
+        verbosity_level=verbosity_level,
+        included_agents=("librarian", "mle_solver"),
+        max_completion_tokens=max_completion_tokens,
+        max_history_tokens=max_history_tokens,
+    )
+    with benchmark_observability_context(
+        enable_langfuse=enable_langfuse,
+        benchmark_name="gaia",
+        split=split,
+        nrows=nrows,
+        model_name=model_name,
+        langfuse_session_id=langfuse_session_id,
+        extra_metadata={"predictions_path": predictions_path, "start_index": start_index},
+    ) as benchmark_run_id:
+        workspace_session_ids = make_workspace_session_ids(
+            benchmark_run_id=benchmark_run_id,
+            count=len(selected_examples),
+        )
+        tasks = []
+        true_answers = []
+        for session_id, example in zip(workspace_session_ids, selected_examples):
+            file_path = example["file_path"]
+            file_name = None
+            if file_path:
+                file_name = file_path.split("/")[-1]
+                local_file_path = hf_hub_download(
+                    repo_id="gaia-benchmark/GAIA",
+                    repo_type="dataset",
+                    filename=file_path,
+                )
+                session_dir = Path(settings.WORKSPACE_DIR) / session_id
+                session_dir.mkdir(parents=True, exist_ok=True)
+                shutil.copy(local_file_path, session_dir / file_name)
+            task = render_prompt(
+                QUESTION_PROMPT, question=example["question"], attached_files=file_name
+            )
+            tasks.append(task)
+            true_answers.append(example["true_answer"])
+
+        predicted_answers = await run_batch(
+            tasks,
+            agent,
+            mcp_config=MCP_CONFIG,
+            max_concurrency=max_workers,
+            session_ids=workspace_session_ids,
+            add_mcp_server_prefixes=False,
+            task_timeout=7200,
+            output_path=Path(predictions_path),
+        )
+
+    correct_count = 0
+    all_count = 0
+    for predicted_answer, true_answer in zip(predicted_answers, true_answers):
+        predicted_answer = _get_final_answer(predicted_answer)
+        is_correct = _answer_scorer(predicted_answer, true_answer)
+        print(f"True answer: {true_answer}\nPredicted answer: {predicted_answer}")
+        print(f"Is correct: {is_correct}")
+        print()
+        correct_count += int(is_correct)
+        all_count += 1
+    print(f"Overall accuracy: {correct_count / all_count * 100.0:.1f}")
+
+
+if __name__ == "__main__":
+    fire.Fire(run_gaia)
